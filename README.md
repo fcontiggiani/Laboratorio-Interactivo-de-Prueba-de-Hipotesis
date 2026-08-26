@@ -11,10 +11,7 @@ contraste de hipótesis descripto más abajo.
 
 ## Demo
 
-## Demo
-
-Abrí el [`demo`](https://fcontiggiani.github.io/
-Laboratorio-Interactivo-de-Prueba-de-Hipotesis/index.html) directamente en el navegador — no requiere servidor.
+Abrí el [`demo`](https://fcontiggiani.github.io/Laboratorio-Interactivo-de-Prueba-de-Hipotesis/index.html) directamente en el navegador — no requiere servidor.
 
 ## ¿Qué hace?
 

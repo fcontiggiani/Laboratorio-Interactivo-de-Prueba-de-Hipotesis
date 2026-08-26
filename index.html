@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Prueba de Hipótesis</title>
+<meta name="description" content="Simulador interactivo de contrastes de hipótesis sobre la media y la varianza poblacional: población regenerable con media fijada discrecionalmente, distribución muestral de X̄, estadístico t y estadístico χ², regiones de rechazo y tasas de rechazo empíricas contrastadas por tamaño de muestra y nivel de significancia.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1B2A2E;
+  --ink-soft: #52656A;
+  --paper: #EEF2F0;
+  --panel: #FFFFFF;
+  --panel-2: #F5F8F6;
+  --line: #D8DFDB;
+  --line-strong: #B7C2BC;
+  --accent: #2C5F6F;
+  --accent-soft: #DCE9E9;
+  --warm: #C97A2B;
+  --warm-soft: #F3E3CE;
+  --good: #2F7A57;
+  --good-soft: #DCEEE3;
+  --bad: #AE3E39;
+  --bad-soft: #F5DEDC;
+  --warn: #A9791F;
+  --warn-soft: #F1E4C2;
+  --level-1: #E8B978;
+  --level-2: #DDA05A;
+  --level-3: #C97A2B;
+  --level-4: #A85A1C;
+  --level-5: #793D10;
+  --shadow: 0 1px 2px rgba(27,42,46,0.06), 0 6px 16px rgba(27,42,46,0.06);
+  --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Public Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #E7EDEA; --ink-soft: #9FB0AC; --paper: #101718; --panel: #182122; --panel-2: #1E2829;
+    --line: #2A3536; --line-strong: #3C4949;
+    --accent: #7FBCC9; --accent-soft: #1E3134;
+    --warm: #E3A75E; --warm-soft: #34260F;
+    --good: #74C296; --good-soft: #17301F;
+    --bad: #E2867E; --bad-soft: #351C1A;
+    --warn: #D8AC57; --warn-soft: #332707;
+    --level-1: #F0C98A; --level-2: #E7AE68; --level-3: #E3A75E; --level-4: #C4813C; --level-5: #9C5F28;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.4);
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #E7EDEA; --ink-soft: #9FB0AC; --paper: #101718; --panel: #182122; --panel-2: #1E2829;
+  --line: #2A3536; --line-strong: #3C4949;
+  --accent: #7FBCC9; --accent-soft: #1E3134;
+  --warm: #E3A75E; --warm-soft: #34260F;
+  --good: #74C296; --good-soft: #17301F;
+  --bad: #E2867E; --bad-soft: #351C1A;
+  --warn: #D8AC57; --warn-soft: #332707;
+  --level-1: #F0C98A; --level-2: #E7AE68; --level-3: #E3A75E; --level-4: #C4813C; --level-5: #9C5F28;
+  --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.4);
+}
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+sub { font-size: 0.68em; }
+.app-shell { max-width: 1360px; margin: 0 auto; padding: 34px 24px 70px; }
+
+.masthead-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+header.masthead .kicker {
+  text-transform: uppercase; letter-spacing: 0.09em; font-size: 0.72rem;
+  color: var(--accent); font-weight: 600;
+}
+
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-sans); font-weight: 600; font-size: 0.78rem;
+  padding: 7px 13px; border-radius: 20px; border: 1px solid var(--line-strong);
+  background: var(--panel); color: var(--ink); cursor: pointer; white-space: nowrap;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+.theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.theme-toggle .icon { font-size: 0.95rem; line-height: 1; }
+header.masthead h1 {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.5rem);
+  text-wrap: balance; margin: 6px 0 12px; letter-spacing: -0.01em;
+}
+header.masthead p.lede { max-width: 70ch; color: var(--ink-soft); font-size: 1.02rem; }
+
+details.theory { margin-top: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+details.theory summary {
+  cursor: pointer; padding: 14px 20px; font-weight: 600; font-size: 0.92rem;
+  list-style: none; display: flex; align-items: center; gap: 8px;
+}
+details.theory summary::-webkit-details-marker { display: none; }
+details.theory summary::before { content: "▸"; color: var(--accent); transition: transform 0.15s ease; }
+details.theory[open] summary::before { transform: rotate(90deg); }
+.theory-body { padding: 0 22px 22px; font-size: 0.93rem; line-height: 1.75; color: var(--ink); border-top: 1px solid var(--line); }
+.theory-body p { margin: 14px 0; }
+.theory-body .formula {
+  font-family: var(--font-mono); background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 12px 16px; display: block; margin: 14px 0; font-size: 0.95rem;
+  overflow-x: auto; white-space: nowrap;
+}
+.theory-body ul { margin: 10px 0; padding-left: 22px; }
+.theory-body li { margin: 6px 0; }
+.theory-body .refs { font-size: 0.82rem; color: var(--ink-soft); margin-top: 18px; }
+.theory-body .refs p { margin: 4px 0; }
+
+.dashboard { display: flex; flex-direction: column; gap: 22px; margin-top: 28px; }
+
+.controls-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(228px, 1fr)); gap: 16px; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 20px; box-shadow: var(--shadow); }
+.card h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); font-weight: 700; margin: 0 0 13px; }
+
+.segmented { display: flex; flex-wrap: wrap; gap: 6px; }
+.segmented.dist button { flex: 1 1 calc(50% - 6px); }
+.segmented button {
+  font-family: var(--font-mono); font-size: 0.8rem; padding: 7px 10px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer;
+}
+.segmented button.active { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+.segmented button:hover:not(.active) { border-color: var(--line-strong); }
+
+.field-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.field-row label { font-size: 0.74rem; color: var(--ink-soft); white-space: nowrap; }
+.field-row input[type="text"], .field-row input[type="number"] {
+  font-family: var(--font-mono); font-size: 0.83rem; width: 100%; padding: 7px 9px;
+  border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink);
+}
+.field-pair { display: flex; gap: 10px; }
+.field-pair .field-row { flex: 1 1 0; margin-top: 0; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.btn {
+  font-family: var(--font-sans); font-weight: 600; font-size: 0.82rem; padding: 9px 13px;
+  border-radius: 8px; border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--ink);
+  cursor: pointer; flex: 1 1 auto;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.full { width: 100%; }
+.btn:focus-visible, .segmented button:focus-visible, select:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+.readout-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.readout-row:last-child { border-bottom: none; }
+.readout-row .val { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+select.reps {
+  font-family: var(--font-mono); font-size: 0.83rem; padding: 7px 9px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); width: 100%;
+}
+
+dl.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 9px 14px; margin: 0; }
+dl.stat-grid div { display: flex; flex-direction: column; gap: 1px; }
+dl.stat-grid dt { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
+dl.stat-grid dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.96rem; }
+
+.test-block + .test-block { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.test-block .test-name { font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin: 0 0 10px; }
+
+.panels { display: flex; flex-direction: column; gap: 20px; }
+.panel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 900px) { .panel-row { grid-template-columns: 1fr; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 17px 19px 19px; box-shadow: var(--shadow); }
+.panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 10px; margin-bottom: 6px; }
+.panel-head h3 { font-family: var(--font-display); font-size: 1.06rem; font-weight: 600; margin: 0; }
+.panel-head .tag { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-soft); white-space: nowrap; }
+.panel-sub { font-size: 0.8rem; color: var(--ink-soft); margin: 0 0 10px; }
+canvas.chart { width: 100%; display: block; }
+.caption { font-size: 0.79rem; color: var(--ink-soft); margin-top: 9px; line-height: 1.6; }
+.muted { color: var(--ink-soft); font-size: 0.85rem; }
+
+.verdict { font-weight: 600; font-size: 0.86rem; margin: 10px 0 0; }
+.verdict.good { color: var(--good); }
+.verdict.bad { color: var(--bad); }
+.stat-readout { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.98rem; margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--line); }
+
+section.comparison { margin-top: 26px; }
+section.comparison > h2 {
+  font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; margin: 0 0 4px;
+}
+section.comparison > p.sub { color: var(--ink-soft); font-size: 0.9rem; max-width: 74ch; margin: 0 0 16px; }
+.comparison-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 20px; }
+@media (max-width: 1040px) { .comparison-grid { grid-template-columns: 1fr; } }
+
+.table-wrap { overflow-x: auto; }
+table.matrix { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+table.matrix th, table.matrix td { padding: 9px 11px; border-bottom: 1px solid var(--line); text-align: right; }
+table.matrix th.num, table.matrix td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+table.matrix thead th {
+  font-family: var(--font-sans); font-weight: 700; color: var(--ink-soft); font-size: 0.68rem;
+  text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--line-strong);
+}
+table.matrix thead th:first-child, table.matrix tbody th { text-align: left; }
+table.matrix tbody th { font-family: var(--font-mono); font-weight: 600; }
+table.matrix tbody td { cursor: pointer; }
+table.matrix tbody td:hover { background: var(--accent-soft); }
+table.matrix tbody td.active {
+  background: var(--warm-soft); color: var(--warm); font-weight: 700;
+  box-shadow: inset 0 0 0 1.5px var(--warm);
+}
+
+table.reps-table { border-collapse: collapse; width: 100%; font-size: 0.83rem; }
+table.reps-table th, table.reps-table td { padding: 7px 9px; text-align: center; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.reps-table thead th {
+  font-family: var(--font-sans); font-weight: 700; color: var(--ink-soft); font-size: 0.66rem;
+  text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--line-strong);
+}
+table.reps-table tbody td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+table.reps-table tbody tr.rep-row { cursor: pointer; }
+table.reps-table tbody tr.rep-row:hover { background: var(--accent-soft); }
+table.reps-table tbody tr.rep-row.selected { background: var(--warm-soft); }
+.badge-test { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; font-family: var(--font-sans); }
+.badge-test.pass { background: var(--good-soft); color: var(--good); }
+.badge-test.fail { background: var(--bad-soft); color: var(--bad); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 9px 16px; margin-top: 12px; font-size: 0.77rem; color: var(--ink-soft); }
+.legend .item { display: flex; align-items: center; gap: 6px; }
+.legend .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; }
+.legend .swatch.line { width: 16px; height: 3px; border-radius: 2px; }
+
+.rate-strip-block + .rate-strip-block { margin-top: 18px; }
+.rate-strip-label { font-size: 0.78rem; color: var(--ink-soft); margin-bottom: 8px; }
+.rate-strip-label strong { color: var(--ink); }
+.rate-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.rate-badge { border: 1px solid var(--line); border-radius: 9px; padding: 11px 8px; text-align: center; display: flex; flex-direction: column; gap: 4px; background: var(--panel-2); }
+.rate-badge .rb-n { font-size: 0.68rem; color: var(--ink-soft); font-family: var(--font-mono); }
+.rate-badge .rb-val { font-family: var(--font-mono); font-size: 1.08rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); }
+.rate-badge.empty { color: var(--ink-soft); border-style: dashed; }
+.rate-badge.empty .rb-val { color: var(--ink-soft); font-weight: 500; font-size: 0.85rem; }
+
+.small-dist-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 12px; }
+@media (max-width: 900px) { .small-dist-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .small-dist-grid { grid-template-columns: 1fr; } }
+.small-dist-cell { border: 1px solid var(--line); border-radius: 10px; padding: 12px 12px 13px; background: var(--panel-2); }
+.small-dist-head { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 8px; }
+.small-dist-caption { font-size: 0.71rem; color: var(--ink-soft); margin: 8px 0 0; line-height: 1.55; }
+
+footer.notes { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 0.79rem; color: var(--ink-soft); line-height: 1.75; max-width: 90ch; }
+footer.notes h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; color: var(--ink-soft); }
+footer.notes p { margin: 4px 0; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <p class="kicker">Econometría · Inferencia estadística</p>
+      <button class="theme-toggle" id="themeToggleBtn" type="button" aria-pressed="false" aria-label="Cambiar a tema oscuro">
+        <span class="icon" aria-hidden="true">🌙</span><span class="theme-toggle-label">Oscuro</span>
+      </button>
+    </div>
+    <h1>Laboratorio de Prueba de Hipótesis</h1>
+    <p class="lede">
+      Un instrumento de simulación para observar, de manera empírica, la mecánica del contraste de hipótesis
+      clásico sobre la media y la varianza poblacional: cómo el tamaño muestral <em>n</em>, el nivel de
+      significancia α y la distancia entre el valor hipotetizado y el valor poblacional efectivo determinan,
+      conjuntamente, la tasa de rechazo de H₀ bajo repetición del procedimiento de muestreo.
+    </p>
+
+    <details class="theory">
+      <summary>Fundamento teórico</summary>
+      <div class="theory-body">
+        <p>
+          Sea <em>X</em> una variable aleatoria con media poblacional μ y varianza poblacional σ² finita. De la
+          población generada en este entorno —de tamaño <em>N</em> = 200&nbsp;000, tratada como una aproximación
+          discreta a la distribución poblacional subyacente, y cuya media μ puede fijarse discrecionalmente en el
+          panel «Población»— se extraen muestras aleatorias simples de tamaño <em>n</em>, con reposición, replicando
+          el supuesto de muestreo aleatorio independiente e idénticamente distribuido (i.i.d.) sobre el que se apoya
+          la teoría clásica de contraste de hipótesis (Wooldridge, 2025, cap. 4; Stock &amp; Watson, 2020, cap. 3).
+        </p>
+        <p>
+          Un contraste de hipótesis formula una afirmación sobre un parámetro poblacional —la hipótesis nula
+          H₀— frente a una hipótesis alternativa H₁, y decide entre ambas a partir de un estadístico de prueba
+          calculado sobre la muestra. Este laboratorio implementa dos contrastes clásicos y bilaterales,
+          ejecutados en paralelo sobre las mismas muestras:
+        </p>
+        <ul>
+          <li>
+            <strong>Contraste sobre la media (prueba t).</strong> H₀: μ = μ₀ frente a H₁: μ ≠ μ₀. Bajo H₀, y con
+            σ² desconocida —estimada mediante la cuasivarianza muestral s² = (n−1)⁻¹Σᵢ(Xᵢ−X̄)²—, el estadístico
+          </li>
+        </ul>
+        <span class="formula">t = (X̄ − μ₀) / (s/√n) &nbsp;~&nbsp; t<sub>n−1</sub> &nbsp;bajo H₀</span>
+        <p>
+          se distribuye t de Student con n−1 grados de libertad. En su formulación bilateral, el valor p asociado
+          es la probabilidad, bajo H₀, de observar un estadístico al menos tan alejado de cero como el
+          efectivamente calculado: p = P(|T<sub>n−1</sub>| ≥ |t|). Se rechaza H₀ al nivel de significancia α si
+          p &lt; α, o equivalentemente si |t| supera el valor crítico t<sub>n−1,α/2</sub> (más abajo se describen
+          las variantes unilaterales).
+        </p>
+        <ul>
+          <li>
+            <strong>Contraste sobre la varianza (prueba χ²).</strong> H₀: σ² = σ₀² frente a H₁: σ² ≠ σ₀². Bajo H₀
+            y supuesto de normalidad poblacional, el estadístico
+          </li>
+        </ul>
+        <span class="formula">T = (n−1)s² / σ₀² &nbsp;~&nbsp; χ²<sub>n−1</sub> &nbsp;bajo H₀</span>
+        <p>
+          se distribuye χ² con n−1 grados de libertad. Es importante no confundir el objeto de esta distribución:
+          <strong>s² no sigue una distribución χ²</strong>; lo que sigue una χ²<sub>n−1</sub> bajo H₀ es el
+          estadístico de prueba T, y la relación exacta es s² ~ [σ₀²/(n−1)]·χ²<sub>n−1</sub>. A diferencia del
+          contraste t —que es aproximadamente válido incluso al alejarse moderadamente de la normalidad
+          poblacional, por invocar el teorema central del límite—, el contraste χ² sobre la varianza es
+          considerablemente más sensible a la normalidad del proceso generador de datos, y su validez formal se
+          deteriora con mayor rapidez cuando esa condición falla (Stock &amp; Watson, 2020, cap. 3; Wooldridge,
+          2025, cap. 4).
+        </p>
+        <p>
+          Cada uno de estos contrastes admite, además, una versión bilateral y dos versiones unilaterales, según
+          la hipótesis alternativa que se juzgue relevante. Frente a H₀: μ = μ₀, la alternativa puede plantearse
+          como H₁: μ ≠ μ₀ (contraste bilateral, el caso general ya descripto), H₁: μ &gt; μ₀ (contraste unilateral
+          de cola derecha) o H₁: μ &lt; μ₀ (contraste unilateral de cola izquierda) —y, análogamente, H₁: σ² ≠ σ₀²,
+          σ² &gt; σ₀² o σ² &lt; σ₀² para el contraste sobre la varianza. La región de rechazo se redistribuye en
+          consecuencia: en el caso bilateral, el área α se reparte por partes iguales en ambas colas de la
+          distribución bajo H₀; en los casos unilaterales, el área α completa se concentra en una única cola —la
+          indicada por H₁—, lo que desplaza el valor crítico hacia el centro de la distribución y, en
+          consecuencia, aumenta la potencia del contraste frente a alternativas ubicadas del lado correspondiente
+          (a costa de no poder detectar, por construcción, un apartamiento de H₀ en la dirección opuesta). El
+          valor p se calcula, en cada caso, como la probabilidad bajo H₀ de observar un resultado al menos tan
+          favorable a H₁ como el efectivamente obtenido: P(T ≥ t) para H₁: μ &gt; μ₀, P(T ≤ t) para H₁: μ &lt; μ₀,
+          y P(|T| ≥ |t|) para el caso bilateral —con la sustitución análoga del estadístico χ² en el contraste
+          sobre la varianza. El selector «Tipo de contraste» del panel «Hipótesis nula H₀» permite elegir entre
+          estas tres formulaciones; todos los paneles del laboratorio —regiones de rechazo, valores p, tasas de
+          rechazo empíricas y potencia teórica de la matriz sistemática— se recalculan en consecuencia.
+        </p>
+        <p>
+          En ambos contrastes coexisten dos tipos de error: el <strong>error de tipo I</strong>, que consiste en
+          rechazar H₀ cuando en realidad es verdadera —su probabilidad es, por construcción, exactamente α—, y el
+          <strong>error de tipo II</strong>, que consiste en no rechazar H₀ cuando en realidad es falsa. La
+          <strong>potencia</strong> del contraste, 1 menos la probabilidad de error de tipo II, crece con el
+          tamaño muestral n y con la distancia entre el valor hipotetizado y el valor poblacional efectivo, y
+          decrece con el nivel de significancia α exigido. Este laboratorio permite observar ambos fenómenos: si
+          se fija μ₀ igual a la μ efectiva de la población (o σ₀² igual a su σ² efectiva), la tasa de rechazo
+          empírica bajo repetición del muestreo debería aproximarse a α —una estimación del error de tipo I—; si
+          se aleja μ₀ (o σ₀²) del valor poblacional efectivo, la tasa de rechazo observada estima, en cambio, la
+          potencia del contraste frente a esa alternativa específica.
+        </p>
+        <ul>
+          <li>
+            <strong>Resultado exacto vs. asintótico.</strong> Bajo normalidad poblacional exacta, la distribución
+            t del estadístico de media es exacta para cualquier n. En ausencia de normalidad, es un resultado
+            asintótico: a medida que n → ∞, el teorema central del límite y la consistencia de s² garantizan que
+            la distribución del estadístico t converge a la normal estándar (t<sub>n−1,α/2</sub> → z<sub>α/2</sub>
+            por el teorema de Slutsky), pero el procedimiento no se vuelve exacto por el mero tamaño de la
+            muestra cuando se aplica con n pequeño sobre poblaciones marcadamente no normales.
+          </li>
+          <li>
+            <strong>Nota sobre la tabla sistemática.</strong> Para aislar el efecto de n y de α sobre la
+            probabilidad de rechazo del contraste de media, la matriz n × α de la sección «Comparación
+            sistemática» reporta la <em>potencia teórica</em> calculada bajo una aproximación normal con σ
+            poblacional conocida —aquí disponible por tratarse de una simulación controlada—, en lugar de la
+            potencia exacta del contraste t con varianza desconocida (que involucra la distribución t no central).
+            Las tarjetas de muestra individual y las tasas de rechazo empíricas, en cambio, emplean siempre la
+            cuasivarianza muestral s², que es el caso realista en el que σ² es desconocida.
+          </li>
+        </ul>
+        <div class="refs">
+          <h4>Referencias</h4>
+          <p>Stock, J. H., &amp; Watson, M. W. (2020). <em>Introduction to econometrics</em> (4.ª ed. global). Pearson Education Limited.</p>
+          <p>Wooldridge, J. M. (2025). <em>Introductory econometrics: A modern approach</em> (8.ª ed.). Cengage Learning.</p>
+        </div>
+      </div>
+    </details>
+  </header>
+
+  <main class="dashboard">
+    <section class="controls-row">
+      <div class="card">
+        <h2>Población</h2>
+        <div class="segmented dist" id="popDistButtons">
+          <button data-dist="normal" class="active" type="button">Normal</button>
+          <button data-dist="uniform" type="button">Uniforme</button>
+          <button data-dist="exponential" type="button">Exponencial</button>
+          <button data-dist="bimodal" type="button">Bimodal</button>
+        </div>
+        <div class="field-row">
+          <label for="muInput">μ poblacional</label>
+          <input type="number" id="muInput" value="50" step="1">
+        </div>
+        <div class="field-row">
+          <label for="seedInput">semilla</label>
+          <input type="text" id="seedInput" value="20260826" inputmode="numeric">
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="randomizeSeedBtn" type="button">Aleatorizar semilla</button>
+          <button class="btn primary full" id="regenBtn" type="button">Generar nueva población</button>
+        </div>
+        <div style="margin-top:14px;">
+          <div class="readout-row"><span>N</span><span class="val" id="popNReadout">—</span></div>
+          <div class="readout-row"><span>μ poblacional (efectiva)</span><span class="val" id="popMeanReadout">—</span></div>
+          <div class="readout-row"><span>σ poblacional</span><span class="val" id="popSDReadout">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Tamaño de muestra</h2>
+        <div class="segmented" id="nButtons">
+          <button data-n="10" type="button">n = 10</button>
+          <button data-n="100" class="active" type="button">n = 100</button>
+          <button data-n="1000" type="button">n = 1.000</button>
+          <button data-n="10000" type="button">n = 10.000</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Hipótesis nula H₀</h2>
+        <div class="field-pair">
+          <div class="field-row"><label for="h0MeanInput">μ₀</label><input type="number" id="h0MeanInput" value="50" step="1"></div>
+          <div class="field-row"><label for="h0VarInput">σ₀²</label><input type="number" id="h0VarInput" value="100" min="0.01" step="1"></div>
+        </div>
+        <p class="muted" style="font-size:0.72rem;margin-top:10px;">
+          μ₀ para la prueba t sobre la media; σ₀² para la prueba χ² sobre la varianza.
+        </p>
+        <div style="margin-top:14px;">
+          <span class="sect-lbl muted" style="font-size:0.74rem;display:block;margin-bottom:6px;">Tipo de contraste (H₁)</span>
+          <div class="segmented" id="tailButtons">
+            <button data-tail="two" class="active" type="button">Bilateral (≠)</button>
+            <button data-tail="right" type="button">Cola derecha (&gt;)</button>
+            <button data-tail="left" type="button">Cola izquierda (&lt;)</button>
+          </div>
+        </div>
+        <p class="muted" style="font-size:0.72rem;margin-top:10px;" id="hypothesisStatement"></p>
+      </div>
+
+      <div class="card">
+        <h2>Nivel de significancia</h2>
+        <div class="segmented" id="alphaButtons">
+          <button data-alpha="0.2" type="button">α = 0,20</button>
+          <button data-alpha="0.1" type="button">α = 0,10</button>
+          <button data-alpha="0.05" class="active" type="button">α = 0,05</button>
+          <button data-alpha="0.01" type="button">α = 0,01</button>
+          <button data-alpha="0.001" type="button">α = 0,001</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Simulación</h2>
+        <label for="repsSelect" class="muted" style="font-size:0.78rem;">Réplicas (R) para la distribución muestral</label>
+        <select class="reps" id="repsSelect" style="margin-top:6px;">
+          <option value="10">10</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="500" selected>500</option>
+          <option value="1000">1.000</option>
+        </select>
+        <div class="btn-row" style="flex-direction:column;">
+          <button class="btn primary full" id="drawSampleBtn" type="button">Extraer una muestra</button>
+          <button class="btn full" id="runSimBtn" type="button">Ejecutar R réplicas (n actual)</button>
+          <button class="btn full" id="compareBtn" type="button">Comparar los 4 tamaños</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="card">
+      <h2>Muestra actual</h2>
+      <div id="sampleCard"><p class="muted">Todavía no extrajiste ninguna muestra.</p></div>
+    </div>
+
+    <div class="panels">
+      <div class="panel-row">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Distribución poblacional</h3>
+            <span class="tag" id="popTag">—</span>
+          </div>
+          <p class="panel-sub">Histograma de los N valores generados, con μ efectiva (línea sólida) y μ₀ (línea discontinua) señaladas sobre el eje.</p>
+          <canvas class="chart" id="popCanvas" style="height:190px;" role="img" aria-label="Histograma de la distribución poblacional"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Distribución muestral de X̄ y contraste t</h3>
+          </div>
+          <p class="panel-sub" id="sampDistSub"></p>
+          <canvas class="chart" id="sampDistCanvas" style="height:230px;" role="img" aria-label="Distribución muestral de la media con región de rechazo del contraste t"></canvas>
+          <p class="caption" id="sampDistCaption"></p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Estadístico T = (n−1)s²/σ₀² y contraste χ²</h3>
+          <span class="tag" id="chiTag">—</span>
+        </div>
+        <p class="panel-sub" id="chiSub"></p>
+        <canvas class="chart" id="chiCanvas" style="height:230px;" role="img" aria-label="Distribución chi-cuadrado del estadístico de prueba de varianza con región de rechazo"></canvas>
+        <p class="caption" id="chiCaption"></p>
+      </div>
+    </div>
+
+    <div class="card" id="repsTableCard" style="display:none;">
+      <h2>10 muestras independientes · n = <span id="repsTableN">—</span></h2>
+      <p class="muted" style="font-size:0.82rem;margin-bottom:10px;">
+        Detalle de cada una de las R&nbsp;=&nbsp;10 réplicas ejecutadas para el tamaño de muestra actual: media,
+        cuasivarianza, estadísticos t y χ², valores p y dictamen de ambos contrastes. Hacé clic en una fila para
+        ver el histograma de esa muestra en particular.
+      </p>
+      <div style="overflow-x:auto">
+        <table class="reps-table">
+          <thead>
+            <tr>
+              <th>#</th><th>x̄</th><th>s²</th>
+              <th>t</th><th>p (t)</th><th>H₀: μ</th>
+              <th>χ²</th><th>p (χ²)</th><th>H₀: σ²</th>
+            </tr>
+          </thead>
+          <tbody id="repsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" id="selectedSampleCard" style="display:none;">
+      <div class="panel-head">
+        <h3 id="selectedSampleTitle">Muestra seleccionada</h3>
+      </div>
+      <dl class="stat-grid" id="selectedSampleStats"></dl>
+      <p class="verdict" id="selectedSampleVerdict"></p>
+      <div class="cw" style="margin-top:12px;">
+        <canvas class="chart" id="selectedSampleCanvas" style="height:170px;" role="img" aria-label="Histograma de la muestra seleccionada"></canvas>
+      </div>
+      <div class="legend" id="selectedSampleLegend"></div>
+    </div>
+  </main>
+
+  <section class="comparison">
+    <h2>Comparación sistemática</h2>
+    <p class="sub" id="comparisonSub"></p>
+    <div class="comparison-grid">
+      <div class="table-wrap">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>n</th>
+              <th class="num">α=0,20</th>
+              <th class="num">α=0,10</th>
+              <th class="num">α=0,05</th>
+              <th class="num">α=0,01</th>
+              <th class="num">α=0,001</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonTableBody"></tbody>
+        </table>
+      </div>
+      <div class="panel" style="padding-top:16px;">
+        <canvas class="chart" id="comparisonChartCanvas" style="height:230px;" role="img" aria-label="Probabilidad de rechazo en función del tamaño muestral, por nivel de significancia"></canvas>
+        <div class="legend" id="comparisonLegend"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h2>Distribuciones muestrales por tamaño de muestra</h2>
+      <p class="muted" style="font-size:0.82rem;">
+        Histograma de las medias muestrales de las R réplicas ejecutadas para cada n, con la densidad
+        N(μ, σ²/n) de referencia y la tasa de rechazo empírica del contraste t al nivel α actual. Se completa con
+        «Ejecutar R réplicas» (n actual) o, para los cuatro tamaños a la vez, con «Comparar los 4 tamaños».
+      </p>
+      <div class="small-dist-grid" id="smallDistGrid">
+        <div class="small-dist-cell">
+          <div class="small-dist-head">n = 10</div>
+          <canvas class="chart" id="smallDistCanvas10" style="height:120px;" role="img" aria-label="Distribución muestral de X̄ para n=10"></canvas>
+          <p class="small-dist-caption" id="smallDistCaption10"></p>
+        </div>
+        <div class="small-dist-cell">
+          <div class="small-dist-head">n = 100</div>
+          <canvas class="chart" id="smallDistCanvas100" style="height:120px;" role="img" aria-label="Distribución muestral de X̄ para n=100"></canvas>
+          <p class="small-dist-caption" id="smallDistCaption100"></p>
+        </div>
+        <div class="small-dist-cell">
+          <div class="small-dist-head">n = 1.000</div>
+          <canvas class="chart" id="smallDistCanvas1000" style="height:120px;" role="img" aria-label="Distribución muestral de X̄ para n=1.000"></canvas>
+          <p class="small-dist-caption" id="smallDistCaption1000"></p>
+        </div>
+        <div class="small-dist-cell">
+          <div class="small-dist-head">n = 10.000</div>
+          <canvas class="chart" id="smallDistCanvas10000" style="height:120px;" role="img" aria-label="Distribución muestral de X̄ para n=10.000"></canvas>
+          <p class="small-dist-caption" id="smallDistCaption10000"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h2>Comparación de formas: distribuciones muestrales sobre un soporte común</h2>
+      <p class="muted" style="font-size:0.82rem;">
+        Estimación de densidad (KDE gaussiana, ancho de banda por regla de Silverman) de la distribución
+        muestral de X̄ para los cuatro tamaños de muestra, superpuestas en un único gráfico sobre un soporte
+        común (el rango conjunto de las réplicas disponibles). Esto permite contrastar directamente cómo se
+        contrae la dispersión de X̄ a medida que <em>n</em> aumenta —y, en consecuencia, cómo se angosta el
+        error estándar que divide al estadístico t—, y observar la asimetría remanente en tamaños de muestra
+        pequeños cuando la población de origen no es normal. Se completa con «Ejecutar R réplicas» (agrega el
+        tamaño n actual) o con «Comparar los 4 tamaños» (los completa simultáneamente).
+      </p>
+      <canvas class="chart" id="overlayDistCanvas" style="height:260px;" role="img" aria-label="Distribuciones muestrales de X̄ para los cuatro tamaños de muestra, superpuestas sobre un soporte común"></canvas>
+      <div class="legend" id="overlayDistLegend"></div>
+      <p class="caption" id="overlayDistCaption"></p>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h2>Tasas de rechazo empíricas por tamaño muestral (α actual)</h2>
+      <p class="muted" style="font-size:0.82rem;">
+        Proporción de réplicas cuyo contraste rechazó H₀, para cada n, al nivel de significancia seleccionado
+        arriba. Si μ₀ (o σ₀²) coincide con el valor poblacional efectivo, esta tasa estima el error de tipo I y
+        debería rondar α; si no coincide, estima la potencia del contraste frente a esa alternativa. Se
+        actualiza con «Comparar los 4 tamaños».
+      </p>
+      <div class="rate-strip-block">
+        <p class="rate-strip-label">Contraste t — H₀: μ = μ₀ <span id="meanNullTag"></span></p>
+        <div class="rate-strip" id="rateStripMean"></div>
+      </div>
+      <div class="rate-strip-block">
+        <p class="rate-strip-label">Contraste χ² — H₀: σ² = σ₀² <span id="varNullTag"></span></p>
+        <div class="rate-strip" id="rateStripVar"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="notes">
+    <h4>Notas metodológicas</h4>
+    <p>El muestreo se realiza con reposición desde la población generada, lo que aproxima el supuesto de observaciones i.i.d. propio del modelo de muestreo aleatorio simple utilizado en econometría introductoria, en lugar de la corrección por población finita propia del muestreo sin reposición.</p>
+    <p>Los valores críticos y valores p de la distribución t se calculan numéricamente mediante la función beta incompleta regularizada (algoritmo de Lentz); los de la distribución χ² mediante la función gamma incompleta regularizada (serie más fracción continua), sin recurrir a tablas precomputadas.</p>
+    <p>La media poblacional μ se fija discrecionalmente en el panel «Población»: cada forma poblacional (normal, uniforme, exponencial, bimodal) se genera con su dispersión y asimetría características y se traslada para que su media efectiva coincida con el valor especificado.</p>
+    <p>El tipo de contraste (bilateral, cola derecha o cola izquierda) se elige en el panel «Hipótesis nula H₀» y se aplica simultáneamente a ambos contrastes (media y varianza): redistribuye la región de rechazo, el valor p y la potencia teórica de la matriz sistemática, sin requerir volver a generar la población ni las réplicas ya ejecutadas.</p>
+    <p>Generado como material didáctico complementario para el curso de Econometría, a partir del Laboratorio de Intervalos de Confianza. Semilla y parámetros quedan expuestos en los paneles de control para garantizar la reproducibilidad de cualquier corrida particular.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Utilidades numéricas: gamma, beta e incompleta gamma/beta, cuantiles ---------- */
+
+  function gammln(xx) {
+    const cof = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+                 -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+    let x = xx, y = xx;
+    let tmp = x + 5.5;
+    tmp -= (x + 0.5) * Math.log(tmp);
+    let ser = 1.000000000190015;
+    for (let j = 0; j < 6; j++) { y += 1; ser += cof[j] / y; }
+    return -tmp + Math.log(2.5066282746310005 * ser / x);
+  }
+
+  function betacf(a, b, x) {
+    const MAXIT = 200, EPS = 3e-14, FPMIN = 1e-300;
+    const qab = a + b, qap = a + 1, qam = a - 1;
+    let c = 1, d = 1 - qab * x / qap;
+    if (Math.abs(d) < FPMIN) d = FPMIN;
+    d = 1 / d;
+    let h = d;
+    for (let m = 1; m <= MAXIT; m++) {
+      const m2 = 2 * m;
+      let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d;
+      h *= d * c;
+      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d;
+      const del = d * c;
+      h *= del;
+      if (Math.abs(del - 1) < EPS) break;
+    }
+    return h;
+  }
+
+  function betai(a, b, x) {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const bt = Math.exp(gammln(a + b) - gammln(a) - gammln(b) + a * Math.log(x) + b * Math.log(1 - x));
+    if (x < (a + 1) / (a + b + 2)) {
+      return bt * betacf(a, b, x) / a;
+    }
+    return 1 - bt * betacf(b, a, 1 - x) / b;
+  }
+
+  // Valor crítico de t de Student de dos colas: P(|T| <= t*) = conf, T ~ t(df)
+  function tCritical(df, conf) {
+    const target = conf;
+    let lo = 1e-15, hi = 1 - 1e-15;
+    for (let i = 0; i < 120; i++) {
+      const mid = (lo + hi) / 2;
+      const val = betai(0.5, df / 2, mid);
+      if (val < target) lo = mid; else hi = mid;
+    }
+    const y = (lo + hi) / 2;
+    return Math.sqrt(df * y / (1 - y));
+  }
+
+  // Valor p bilateral del contraste t: P(|T_df| >= |t|)
+  function tPval(t, df) {
+    return betai(df / 2, 0.5, df / (df + t * t));
+  }
+
+  // Función gamma incompleta regularizada P(a,x) = γ(a,x)/Γ(a)
+  function gammaP(a, x) {
+    if (x <= 0) return 0;
+    if (x < a + 1) {
+      let ap = a, sum = 1 / a, del = 1 / a;
+      for (let n = 0; n < 300; n++) {
+        ap += 1; del *= x / ap; sum += del;
+        if (Math.abs(del) < Math.abs(sum) * 1e-13) break;
+      }
+      return sum * Math.exp(-x + a * Math.log(x) - gammln(a));
+    }
+    let b = x + 1 - a, c = 1e300, d = 1 / b, h = d;
+    for (let i = 1; i <= 300; i++) {
+      const an = -i * (i - a);
+      b += 2; d = an * d + b; if (Math.abs(d) < 1e-300) d = 1e-300;
+      c = b + an / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+      d = 1 / d;
+      const del = d * c; h *= del;
+      if (Math.abs(del - 1) < 1e-13) break;
+    }
+    return 1 - Math.exp(-x + a * Math.log(x) - gammln(a)) * h;
+  }
+
+  // Densidad χ²(df) evaluada en x
+  function chi2PDF(x, df) {
+    if (x <= 0) return 0;
+    return Math.exp((df / 2 - 1) * Math.log(x) - x / 2 - (df / 2) * Math.log(2) - gammln(df / 2));
+  }
+
+  // Valor p bilateral del contraste χ²: 2·min(P(x), 1−P(x))
+  function chi2Pval(x, df) {
+    const p = gammaP(df / 2, x / 2);
+    return 2 * Math.min(p, 1 - p);
+  }
+
+  // Cuantil de la χ²(df): resuelve gammaP(df/2, x/2) = p por bisección
+  function chi2Inv(p, df) {
+    let lo = 0, hi = df + 12 * Math.sqrt(2 * df) + 60;
+    for (let i = 0; i < 100; i++) {
+      const mid = (lo + hi) / 2;
+      if (gammaP(df / 2, mid / 2) < p) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  // Función error y CDF normal estándar (aproximación de Abramowitz & Stegun 7.1.26)
+  function erf(x) {
+    const sign = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+    const t = 1 / (1 + p * x);
+    const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    return sign * y;
+  }
+  function normCDF(z) { return 0.5 * (1 + erf(z / Math.SQRT2)); }
+
+  // P(T_df > t): cola superior de la t de Student, a partir de la simetría del valor p bilateral
+  function tCDFupper(t, df) {
+    const two = tPval(t, df);
+    return t >= 0 ? 0.5 * two : 1 - 0.5 * two;
+  }
+  // P(χ²_df <= x): CDF de la chi-cuadrado
+  function chi2CDF(x, df) { return gammaP(df / 2, x / 2); }
+
+  /* ---------- Generador pseudoaleatorio (mulberry32) y variables aleatorias ---------- */
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function normalFactory(rng) {
+    let spare = null;
+    return function () {
+      if (spare !== null) { const v = spare; spare = null; return v; }
+      let u, v, s;
+      do {
+        u = rng() * 2 - 1; v = rng() * 2 - 1; s = u * u + v * v;
+      } while (s === 0 || s >= 1);
+      const mul = Math.sqrt(-2 * Math.log(s) / s);
+      spare = v * mul;
+      return u * mul;
+    };
+  }
+
+  /* ---------- Configuración ---------- */
+
+  const N_POP = 200000;
+  const N_OPTIONS = [10, 100, 1000, 10000];
+  const ALPHA_OPTIONS = [0.2, 0.1, 0.05, 0.01, 0.001];
+  const ALPHA_LABELS = { 0.2: "0,20", 0.1: "0,10", 0.05: "0,05", 0.01: "0,01", 0.001: "0,001" };
+  const NATURAL_MEAN = { normal: 50, uniform: 50, exponential: 20, bimodal: 50 };
+  const FONT_SANS = '"Public Sans", sans-serif';
+  const FONT_MONO = '"IBM Plex Mono", monospace';
+
+  const N_COLOR_VARS = { 10: "--bad", 100: "--warn", 1000: "--accent", 10000: "--good" };
+
+  // Valores críticos t (bilateral y unilateral) y χ² (bilateral y unilateral) precomputados por (n, α)
+  const TCRIT = {}, TCRIT_ONE = {}, CHI2CRIT = {};
+  N_OPTIONS.forEach(function (n) {
+    const df = n - 1;
+    TCRIT[n] = {}; TCRIT_ONE[n] = {}; CHI2CRIT[n] = {};
+    ALPHA_OPTIONS.forEach(function (a) {
+      TCRIT[n][a] = tCritical(df, 1 - a);
+      TCRIT_ONE[n][a] = tCritical(df, 1 - 2 * a);
+      CHI2CRIT[n][a] = {
+        lo: chi2Inv(a / 2, df), hi: chi2Inv(1 - a / 2, df),
+        oneRight: chi2Inv(1 - a, df), oneLeft: chi2Inv(a, df)
+      };
+    });
+  });
+
+  const state = {
+    distType: "normal",
+    population: null,
+    popMean: 0,
+    popSD: 0,
+    popHistogram: null,
+    n: 100,
+    alpha: 0.05,
+    tailType: "two", // "two" | "right" | "left" — tipo de contraste, común a ambas pruebas (t y χ²)
+    h0Mean: 50,
+    h0Var: 100,
+    reps: 500,
+    currentSample: null,
+    simCache: { 10: null, 100: null, 1000: null, 10000: null },
+    selectedRepIdx: null // fila seleccionada en la tarjeta «10 muestras independientes» (solo con R = 10)
+  };
+
+  function tailSymbols() {
+    if (state.tailType === "right") return { mean: "&gt;", varSym: "&gt;" };
+    if (state.tailType === "left") return { mean: "&lt;", varSym: "&lt;" };
+    return { mean: "≠", varSym: "≠" };
+  }
+
+  /* ---------- Formato ---------- */
+
+  function fN(x, d) {
+    if (d === undefined) d = 2;
+    if (!isFinite(x)) return "—";
+    let rounded = Number(x.toFixed(d));
+    if (rounded === 0) rounded = 0; // normaliza -0 a 0
+    return rounded.toLocaleString("es-AR", { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function fInt(x) { return Math.round(x).toLocaleString("es-AR"); }
+  function fPval(p) { return p < 0.001 ? "<0,001" : fN(p, 3); }
+
+  function fDensity(x) {
+    if (!isFinite(x)) return "—";
+    const abs = Math.abs(x);
+    let d = 2;
+    if (abs !== 0 && abs < 0.01) d = 4; else if (abs !== 0 && abs < 0.1) d = 3;
+    return fN(x, d);
+  }
+
+  /* ---------- Selección de tema (claro/oscuro) ---------- */
+
+  const THEME_STORAGE_KEY = "laboratorioPH_theme";
+
+  function systemPrefersDark() {
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function getStoredTheme() {
+    try { return localStorage.getItem(THEME_STORAGE_KEY); } catch (e) { return null; }
+  }
+  function setStoredTheme(value) {
+    try {
+      if (value) localStorage.setItem(THEME_STORAGE_KEY, value);
+      else localStorage.removeItem(THEME_STORAGE_KEY);
+    } catch (e) { /* almacenamiento no disponible: se ignora silenciosamente */ }
+  }
+  function effectiveTheme() {
+    const explicit = document.documentElement.getAttribute("data-theme");
+    if (explicit === "dark" || explicit === "light") return explicit;
+    return systemPrefersDark() ? "dark" : "light";
+  }
+  function updateThemeToggleUI() {
+    const btn = document.getElementById("themeToggleBtn");
+    if (!btn) return;
+    const isDark = effectiveTheme() === "dark";
+    const icon = btn.querySelector(".icon");
+    const label = btn.querySelector(".theme-toggle-label");
+    if (icon) icon.textContent = isDark ? "☀️" : "🌙";
+    if (label) label.textContent = isDark ? "Claro" : "Oscuro";
+    btn.setAttribute("aria-pressed", isDark ? "true" : "false");
+    btn.setAttribute("aria-label", isDark ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+  }
+  function initTheme() {
+    const stored = getStoredTheme();
+    if (stored === "dark" || stored === "light") {
+      document.documentElement.setAttribute("data-theme", stored);
+    }
+    updateThemeToggleUI();
+  }
+
+  /* ---------- Generación de la población ---------- */
+
+  function generatePopulation(distType, seed, targetMu) {
+    const rng = mulberry32(seed);
+    const randNormal = normalFactory(rng);
+    const arr = new Float64Array(N_POP);
+    let i;
+    if (distType === "normal") {
+      for (i = 0; i < N_POP; i++) arr[i] = 50 + 15 * randNormal();
+    } else if (distType === "uniform") {
+      for (i = 0; i < N_POP; i++) arr[i] = 100 * rng();
+    } else if (distType === "exponential") {
+      for (i = 0; i < N_POP; i++) arr[i] = -Math.log(1 - rng()) / 0.05;
+    } else { // bimodal
+      for (i = 0; i < N_POP; i++) arr[i] = rng() < 0.5 ? (30 + 7 * randNormal()) : (70 + 7 * randNormal());
+    }
+    const offset = targetMu - NATURAL_MEAN[distType];
+    if (offset !== 0) { for (i = 0; i < N_POP; i++) arr[i] += offset; }
+    return arr;
+  }
+
+  function populationMeanSD(arr) {
+    const n = arr.length;
+    let sum = 0, i;
+    for (i = 0; i < n; i++) sum += arr[i];
+    const mean = sum / n;
+    let ss = 0;
+    for (i = 0; i < n; i++) { const d = arr[i] - mean; ss += d * d; }
+    return { mean: mean, sd: Math.sqrt(ss / n) };
+  }
+
+  // keepRaw conserva el arreglo de valores individuales de la muestra (solo se usa con R = 10 réplicas,
+  // para alimentar la tarjeta «10 muestras independientes» y su histograma de detalle; con R mayor no se
+  // retiene, para no acumular memoria innecesaria).
+  function drawSampleStats(pop, n, keepRaw) {
+    const N = pop.length;
+    let mean = 0, M2 = 0, count = 0, i;
+    const data = keepRaw ? new Array(n) : null;
+    for (i = 0; i < n; i++) {
+      const idx = (Math.random() * N) | 0;
+      const x = pop[idx];
+      if (keepRaw) data[i] = x;
+      count++;
+      const delta = x - mean;
+      mean += delta / count;
+      const delta2 = x - mean;
+      M2 += delta * delta2;
+    }
+    const variance = n > 1 ? M2 / (n - 1) : NaN;
+    const result = { mean: mean, variance: variance, sd: Math.sqrt(variance), n: n };
+    if (keepRaw) result.data = data;
+    return result;
+  }
+
+  function runReplications(pop, n, reps, keepRaw) {
+    const out = new Array(reps);
+    for (let r = 0; r < reps; r++) out[r] = drawSampleStats(pop, n, keepRaw);
+    return out;
+  }
+
+  function computeTTest(sampleStats, n, h0Mean) {
+    const df = n - 1;
+    const se = sampleStats.sd / Math.sqrt(n);
+    const t = (sampleStats.mean - h0Mean) / se;
+    let p;
+    if (state.tailType === "right") p = tCDFupper(t, df);
+    else if (state.tailType === "left") p = tCDFupper(-t, df);
+    else p = tPval(t, df);
+    return { df: df, se: se, t: t, p: p };
+  }
+
+  function computeChi2Test(sampleStats, n, h0Var) {
+    const df = n - 1;
+    const stat = df * sampleStats.variance / h0Var;
+    let p;
+    if (state.tailType === "right") p = 1 - chi2CDF(stat, df);
+    else if (state.tailType === "left") p = chi2CDF(stat, df);
+    else p = chi2Pval(stat, df);
+    return { df: df, stat: stat, p: p };
+  }
+
+  function rejectRateMean(repsArr, n, h0Mean, alpha) {
+    let hit = 0;
+    for (let i = 0; i < repsArr.length; i++) {
+      if (computeTTest(repsArr[i], n, h0Mean).p < alpha) hit++;
+    }
+    return hit / repsArr.length;
+  }
+  function rejectRateVar(repsArr, n, h0Var, alpha) {
+    let hit = 0;
+    for (let i = 0; i < repsArr.length; i++) {
+      if (computeChi2Test(repsArr[i], n, h0Var).p < alpha) hit++;
+    }
+    return hit / repsArr.length;
+  }
+
+  // Potencia teórica (aprox. normal, σ conocida) del contraste t sobre la media, según el tipo de contraste vigente
+  function theoreticalRejectProb(n, alpha, popMean, popSD, h0Mean) {
+    const ncp = (popMean - h0Mean) * Math.sqrt(n) / popSD;
+    if (state.tailType === "right") {
+      return 1 - normCDF(TCRIT_ONE[n][alpha] - ncp);
+    }
+    if (state.tailType === "left") {
+      return normCDF(-TCRIT_ONE[n][alpha] - ncp);
+    }
+    const tcrit = TCRIT[n][alpha];
+    return normCDF(-tcrit - ncp) + (1 - normCDF(tcrit - ncp));
+  }
+
+  /* ---------- Histogramas y KDE ---------- */
+
+  function computeHistogram(data, binCount) {
+    let min = Infinity, max = -Infinity, i;
+    for (i = 0; i < data.length; i++) { const v = data[i]; if (v < min) min = v; if (v > max) max = v; }
+    if (!(min < max)) { min -= 1; max += 1; }
+    const width = (max - min) / binCount;
+    const counts = new Array(binCount).fill(0);
+    for (i = 0; i < data.length; i++) {
+      let idx = Math.floor((data[i] - min) / width);
+      if (idx >= binCount) idx = binCount - 1;
+      if (idx < 0) idx = 0;
+      counts[idx]++;
+    }
+    return { min: min, max: max, width: width, counts: counts };
+  }
+
+  function gaussianKDE(data, evalXs, bandwidth) {
+    const n = data.length;
+    const factor = 1 / (n * bandwidth * Math.sqrt(2 * Math.PI));
+    return evalXs.map(function (x) {
+      let sum = 0;
+      for (let i = 0; i < n; i++) {
+        const u = (x - data[i]) / bandwidth;
+        sum += Math.exp(-0.5 * u * u);
+      }
+      return factor * sum;
+    });
+  }
+
+  function niceTicks(min, max, count) {
+    const range = (max - min) || 1;
+    const rawStep = range / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / mag;
+    let step;
+    if (norm < 1.5) step = 1 * mag; else if (norm < 3) step = 2 * mag; else if (norm < 7) step = 5 * mag; else step = 10 * mag;
+    const start = Math.ceil(min / step) * step;
+    const ticks = [];
+    for (let v = start; v <= max + step * 1e-6; v += step) ticks.push(v);
+    return ticks;
+  }
+
+  /* ---------- Canvas: helpers ---------- */
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function prepCanvas(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.max(1, rect.width), h = Math.max(1, rect.height);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas._cssWidth = w; canvas._cssHeight = h;
+    return ctx;
+  }
+
+  function drawAxisX(ctx, min, max, xScale, y) {
+    ctx.strokeStyle = cssVar("--line-strong");
+    ctx.lineWidth = 1;
+    const x0 = xScale(min), x1 = xScale(max);
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+    const plotWidth = Math.abs(x1 - x0);
+    const targetTicks = Math.max(3, Math.min(6, Math.round(plotWidth / 68)));
+    const ticks = niceTicks(min, max, targetTicks);
+    ctx.fillStyle = cssVar("--ink-soft");
+    ctx.font = "11px " + FONT_MONO;
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ticks.forEach(function (t) {
+      const x = xScale(t);
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 4); ctx.strokeStyle = cssVar("--line-strong"); ctx.stroke();
+      ctx.fillText(fN(t, Math.abs(t) >= 1000 ? 0 : 1), x, y + 6);
+    });
+  }
+
+  function clearCanvasPlaceholder(canvas, text) {
+    const ctx = prepCanvas(canvas);
+    const w = canvas._cssWidth, h = canvas._cssHeight;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = cssVar("--ink-soft");
+    ctx.font = "13px " + FONT_SANS;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(text, w / 2, h / 2);
+  }
+
+  // Panel de densidad genérico (histograma + curva teórica opcional), con hasta dos líneas de referencia
+  function drawDensityPanel(canvas, hist, dataLength, refLines, overlayMean, overlaySD, colorMain, colorSoft, colorOverlay) {
+    const ctx = prepCanvas(canvas);
+    const w = canvas._cssWidth, h = canvas._cssHeight;
+    ctx.clearRect(0, 0, w, h);
+    const marginLeft = 50, marginRight = 14, marginTop = 12, marginBottom = 30;
+    const plotW = w - marginLeft - marginRight, plotH = h - marginTop - marginBottom;
+    let maxCount = 0;
+    hist.counts.forEach(function (c) { if (c > maxCount) maxCount = c; });
+    let yMaxCount = maxCount;
+    if (overlaySD) {
+      const peak = (1 / (overlaySD * Math.sqrt(2 * Math.PI))) * dataLength * hist.width;
+      yMaxCount = Math.max(yMaxCount, peak);
+    }
+    yMaxCount = yMaxCount * 1.1 || 1;
+    const xScale = function (v) { return marginLeft + (v - hist.min) / (hist.max - hist.min) * plotW; };
+    const yScale = function (c) { return marginTop + plotH - (c / yMaxCount) * plotH; };
+    ctx.fillStyle = colorSoft; ctx.strokeStyle = colorMain; ctx.lineWidth = 1;
+    hist.counts.forEach(function (c, i) {
+      const x0 = xScale(hist.min + i * hist.width), x1 = xScale(hist.min + (i + 1) * hist.width);
+      const y = yScale(c);
+      const bw = Math.max(0.6, x1 - x0 - 0.6);
+      ctx.fillRect(x0, y, bw, (marginTop + plotH) - y);
+      ctx.strokeRect(x0, y, bw, (marginTop + plotH) - y);
+    });
+    if (overlaySD) {
+      ctx.strokeStyle = colorOverlay; ctx.lineWidth = 2.2; ctx.beginPath();
+      const steps = 140;
+      for (let i = 0; i <= steps; i++) {
+        const x = hist.min + (hist.max - hist.min) * i / steps;
+        const dens = Math.exp(-((x - overlayMean) * (x - overlayMean)) / (2 * overlaySD * overlaySD)) / (overlaySD * Math.sqrt(2 * Math.PI));
+        const ec = dens * dataLength * hist.width;
+        const y = yScale(ec);
+        if (i === 0) ctx.moveTo(xScale(x), y); else ctx.lineTo(xScale(x), y);
+      }
+      ctx.stroke();
+    }
+    (refLines || []).forEach(function (rl) {
+      ctx.strokeStyle = rl.color; ctx.setLineDash(rl.dash ? [5, 4] : []); ctx.lineWidth = 1.6;
+      const xm = xScale(rl.value);
+      ctx.beginPath(); ctx.moveTo(xm, marginTop); ctx.lineTo(xm, marginTop + plotH); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    drawAxisX(ctx, hist.min, hist.max, xScale, marginTop + plotH);
+  }
+
+  // Distribución muestral de X̄ con región de rechazo del contraste t (bilateral o unilateral) y réplicas marcadas
+  function drawSamplingRejectionPanel(canvas, popMean, theoreticalSE, h0Mean, repsArr, n) {
+    const ctx = prepCanvas(canvas);
+    const w = canvas._cssWidth, h = canvas._cssHeight;
+    ctx.clearRect(0, 0, w, h);
+    const marginLeft = 50, marginRight = 14, marginTop = 10, marginBottom = 30, tickZone = 46;
+    const plotTop = marginTop, plotBottom = h - marginBottom - tickZone;
+    const plotH = plotBottom - plotTop;
+    const plotW = w - marginLeft - marginRight;
+    const alpha = state.alpha;
+    const lo = Math.min(popMean, h0Mean) - 5 * theoreticalSE, hi = Math.max(popMean, h0Mean) + 5 * theoreticalSE;
+    const xScale = function (v) { return marginLeft + (v - lo) / (hi - lo) * plotW; };
+    const pts = [];
+    for (let i = 0; i <= 300; i++) { const x = lo + i * (hi - lo) / 300; pts.push({ x: x, y: Math.exp(-((x - popMean) * (x - popMean)) / (2 * theoreticalSE * theoreticalSE)) / (theoreticalSE * Math.sqrt(2 * Math.PI)) }); }
+    const maxY = Math.max.apply(null, pts.map(function (p) { return p.y; })) * 1.08 || 1;
+    const yScale = function (v) { return plotBottom - (v / maxY) * plotH; };
+    // Región(es) de rechazo según el tipo de contraste vigente
+    let shadeRegions;
+    if (state.tailType === "right") {
+      shadeRegions = [{ from: h0Mean + TCRIT_ONE[n][alpha] * theoreticalSE, to: Infinity }];
+    } else if (state.tailType === "left") {
+      shadeRegions = [{ from: -Infinity, to: h0Mean - TCRIT_ONE[n][alpha] * theoreticalSE }];
+    } else {
+      const tcrit = TCRIT[n][alpha];
+      shadeRegions = [{ from: -Infinity, to: h0Mean - tcrit * theoreticalSE }, { from: h0Mean + tcrit * theoreticalSE, to: Infinity }];
+    }
+    ctx.fillStyle = "rgba(174,62,57,0.14)";
+    shadeRegions.forEach(function (r) {
+      const xFrom = isFinite(r.from) ? Math.max(marginLeft, xScale(r.from)) : marginLeft;
+      const xTo = isFinite(r.to) ? Math.min(marginLeft + plotW, xScale(r.to)) : marginLeft + plotW;
+      if (xTo > xFrom) ctx.fillRect(xFrom, plotTop, xTo - xFrom, plotH);
+    });
+    ctx.strokeStyle = cssVar("--accent"); ctx.lineWidth = 2.2; ctx.beginPath();
+    pts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+    ctx.stroke();
+    ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5; ctx.strokeStyle = cssVar("--bad");
+    shadeRegions.forEach(function (r) {
+      [r.from, r.to].forEach(function (v) {
+        if (!isFinite(v)) return;
+        const px = xScale(v);
+        if (px >= marginLeft && px <= marginLeft + plotW) { ctx.beginPath(); ctx.moveTo(px, plotTop); ctx.lineTo(px, plotBottom); ctx.stroke(); }
+      });
+    });
+    ctx.setLineDash([]);
+    ctx.strokeStyle = cssVar("--ink-soft"); ctx.lineWidth = 2;
+    const pxMu = xScale(popMean);
+    ctx.beginPath(); ctx.moveTo(pxMu, plotTop); ctx.lineTo(pxMu, plotBottom); ctx.stroke();
+    ctx.strokeStyle = cssVar("--warm"); ctx.setLineDash([4, 4]); ctx.lineWidth = 2;
+    const pxH0 = xScale(h0Mean);
+    ctx.beginPath(); ctx.moveTo(pxH0, plotTop); ctx.lineTo(pxH0, plotBottom); ctx.stroke();
+    ctx.setLineDash([]);
+    if (repsArr && repsArr.length) {
+      const slotY = plotBottom + 10;
+      const display = repsArr.slice(0, Math.min(60, repsArr.length));
+      display.forEach(function (s, i) {
+        const test = computeTTest(s, n, h0Mean);
+        const rej = test.p < state.alpha;
+        const col = rej ? cssVar("--bad") : cssVar("--good");
+        const px = Math.min(marginLeft + plotW, Math.max(marginLeft, xScale(s.mean)));
+        ctx.strokeStyle = col; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(px, plotBottom); ctx.lineTo(px, slotY + 3); ctx.stroke();
+        ctx.fillStyle = col; ctx.beginPath(); ctx.arc(px, slotY + 8, 3.4, 0, 2 * Math.PI); ctx.fill();
+      });
+      if (repsArr.length > display.length) {
+        ctx.fillStyle = cssVar("--ink-soft"); ctx.font = "10px " + FONT_MONO; ctx.textAlign = "right"; ctx.textBaseline = "alphabetic";
+        ctx.fillText("(+" + (repsArr.length - display.length) + " más)", marginLeft + plotW, slotY + 26);
+      }
+    }
+    drawAxisX(ctx, lo, hi, xScale, plotBottom);
+  }
+
+  // Panel de la densidad χ²(df) con región de rechazo (bilateral o unilateral) y réplicas marcadas
+  function drawChiSquarePanel(canvas, df, repsArr, n, h0Var) {
+    const ctx = prepCanvas(canvas);
+    const w = canvas._cssWidth, h = canvas._cssHeight;
+    ctx.clearRect(0, 0, w, h);
+    const marginLeft = 50, marginRight = 14, marginTop = 10, marginBottom = 30, tickZone = 46;
+    const plotTop = marginTop, plotBottom = h - marginBottom - tickZone;
+    const plotH = plotBottom - plotTop;
+    const plotW = w - marginLeft - marginRight;
+    const alpha = state.alpha;
+    const crit = CHI2CRIT[n][alpha];
+    const xMax = Math.min(chi2Inv(0.999, df), crit.hi * 2.4, df * 6 + 40);
+    const xScale = function (v) { return marginLeft + v / xMax * plotW; };
+    const pts = [];
+    for (let i = 0; i <= 320; i++) { const x = i * xMax / 320; pts.push({ x: x, y: chi2PDF(x, df) }); }
+    const maxY = Math.max.apply(null, pts.map(function (p) { return p.y; })) * 1.08 || 1;
+    const yScale = function (v) { return plotBottom - (v / maxY) * plotH; };
+    // Región(es) de rechazo según el tipo de contraste vigente
+    let shadeRegions;
+    if (state.tailType === "right") {
+      shadeRegions = [{ from: crit.oneRight, to: Infinity }];
+    } else if (state.tailType === "left") {
+      shadeRegions = [{ from: -Infinity, to: crit.oneLeft }];
+    } else {
+      shadeRegions = [{ from: -Infinity, to: crit.lo }, { from: crit.hi, to: Infinity }];
+    }
+    ctx.fillStyle = "rgba(174,62,57,0.14)";
+    shadeRegions.forEach(function (r) {
+      const xFrom = isFinite(r.from) ? Math.max(marginLeft, xScale(r.from)) : marginLeft;
+      const xTo = isFinite(r.to) ? Math.min(marginLeft + plotW, xScale(r.to)) : marginLeft + plotW;
+      if (xTo > xFrom) ctx.fillRect(xFrom, plotTop, xTo - xFrom, plotH);
+    });
+    ctx.strokeStyle = cssVar("--accent"); ctx.lineWidth = 2.2; ctx.beginPath();
+    pts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+    ctx.stroke();
+    ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5; ctx.strokeStyle = cssVar("--bad");
+    shadeRegions.forEach(function (r) {
+      [r.from, r.to].forEach(function (v) {
+        if (!isFinite(v)) return;
+        const px = xScale(v);
+        if (px >= marginLeft && px <= marginLeft + plotW) { ctx.beginPath(); ctx.moveTo(px, plotTop); ctx.lineTo(px, plotBottom); ctx.stroke(); }
+      });
+    });
+    ctx.setLineDash([]);
+    ctx.strokeStyle = cssVar("--warm"); ctx.lineWidth = 2;
+    const pxDf = xScale(df);
+    ctx.beginPath(); ctx.moveTo(pxDf, plotTop); ctx.lineTo(pxDf, plotBottom); ctx.stroke();
+    if (repsArr && repsArr.length) {
+      const slotY = plotBottom + 10;
+      const display = repsArr.slice(0, Math.min(60, repsArr.length));
+      display.forEach(function (s) {
+        const test = computeChi2Test(s, n, h0Var);
+        const rej = test.p < state.alpha;
+        const col = rej ? cssVar("--bad") : cssVar("--good");
+        const px = Math.min(marginLeft + plotW, Math.max(marginLeft, xScale(test.stat)));
+        ctx.strokeStyle = col; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(px, plotBottom); ctx.lineTo(px, slotY + 3); ctx.stroke();
+        ctx.fillStyle = col; ctx.beginPath(); ctx.arc(px, slotY + 8, 3.4, 0, 2 * Math.PI); ctx.fill();
+      });
+      if (repsArr.length > display.length) {
+        ctx.fillStyle = cssVar("--ink-soft"); ctx.font = "10px " + FONT_MONO; ctx.textAlign = "right"; ctx.textBaseline = "alphabetic";
+        ctx.fillText("(+" + (repsArr.length - display.length) + " más)", marginLeft + plotW, slotY + 26);
+      }
+    }
+    drawAxisX(ctx, 0, xMax, xScale, plotBottom);
+  }
+
+  function drawComparisonChart(canvas) {
+    if (!state.population) return;
+    const ctx = prepCanvas(canvas);
+    const w = canvas._cssWidth, h = canvas._cssHeight;
+    ctx.clearRect(0, 0, w, h);
+    const marginLeft = 50, marginRight = 16, marginTop = 14, marginBottom = 32;
+    const plotW = w - marginLeft - marginRight, plotH = h - marginTop - marginBottom;
+    const xs = N_OPTIONS.map(function (n) { return Math.log10(n); });
+    const xMin = xs[0], xMax = xs[xs.length - 1];
+    const xScale = function (v) { return marginLeft + (v - xMin) / (xMax - xMin) * plotW; };
+    const series = ALPHA_OPTIONS.map(function (a) { return N_OPTIONS.map(function (n) { return theoreticalRejectProb(n, a, state.popMean, state.popSD, state.h0Mean); }); });
+    const yScale = function (v) { return marginTop + plotH - v * plotH; };
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (t) {
+      const y = yScale(t);
+      ctx.strokeStyle = cssVar("--line"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(marginLeft, y); ctx.lineTo(marginLeft + plotW, y); ctx.stroke();
+      ctx.fillStyle = cssVar("--ink-soft"); ctx.font = "11px " + FONT_MONO; ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      ctx.fillText(fN(t, 2), marginLeft - 8, y);
+    });
+    ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.font = "11px " + FONT_MONO;
+    N_OPTIONS.forEach(function (n) {
+      const x = xScale(Math.log10(n));
+      ctx.strokeStyle = cssVar("--line-strong");
+      ctx.beginPath(); ctx.moveTo(x, marginTop + plotH); ctx.lineTo(x, marginTop + plotH + 4); ctx.stroke();
+      ctx.fillStyle = cssVar("--ink-soft");
+      ctx.fillText("n=" + fInt(n), x, marginTop + plotH + 7);
+    });
+    const colors = [cssVar("--level-1"), cssVar("--level-2"), cssVar("--level-3"), cssVar("--level-4"), cssVar("--level-5")];
+    series.forEach(function (s, i) {
+      ctx.strokeStyle = colors[i]; ctx.lineWidth = 2.2; ctx.beginPath();
+      s.forEach(function (v, j) {
+        const x = xScale(xs[j]), y = yScale(v);
+        if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      s.forEach(function (v, j) {
+        const x = xScale(xs[j]), y = yScale(v);
+        ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fillStyle = colors[i]; ctx.fill();
+      });
+    });
+  }
+
+  function drawOverlayChart(canvas, seriesList, xMin, xMax) {
+    const ctx = prepCanvas(canvas);
+    const w = canvas._cssWidth, h = canvas._cssHeight;
+    ctx.clearRect(0, 0, w, h);
+    const marginLeft = 58, marginRight = 16, marginTop = 14, marginBottom = 32;
+    const plotW = w - marginLeft - marginRight, plotH = h - marginTop - marginBottom;
+    let yMax = 0;
+    seriesList.forEach(function (s) { s.ys.forEach(function (v) { if (v > yMax) yMax = v; }); });
+    yMax = yMax * 1.12 || 1;
+    const xScale = function (v) { return marginLeft + (v - xMin) / (xMax - xMin) * plotW; };
+    const yScale = function (v) { return marginTop + plotH - (v / yMax) * plotH; };
+    const yticks = niceTicks(0, yMax, 5);
+    ctx.font = "11px " + FONT_MONO;
+    yticks.forEach(function (t) {
+      const y = yScale(t);
+      ctx.strokeStyle = cssVar("--line"); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(marginLeft, y); ctx.lineTo(marginLeft + plotW, y); ctx.stroke();
+      ctx.fillStyle = cssVar("--ink-soft"); ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      ctx.fillText(fDensity(t), marginLeft - 8, y);
+    });
+    ctx.strokeStyle = cssVar("--ink-soft"); ctx.setLineDash([4, 3]); ctx.lineWidth = 1.2;
+    const xm = xScale(state.popMean);
+    ctx.beginPath(); ctx.moveTo(xm, marginTop); ctx.lineTo(xm, marginTop + plotH); ctx.stroke();
+    ctx.setLineDash([]);
+    seriesList.forEach(function (s) {
+      ctx.save();
+      ctx.globalAlpha = 0.11;
+      ctx.fillStyle = s.color;
+      ctx.beginPath();
+      ctx.moveTo(xScale(s.xs[0]), marginTop + plotH);
+      s.xs.forEach(function (x, i) { ctx.lineTo(xScale(x), yScale(s.ys[i])); });
+      ctx.lineTo(xScale(s.xs[s.xs.length - 1]), marginTop + plotH);
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2.2; ctx.beginPath();
+      s.xs.forEach(function (x, i) {
+        const px = xScale(x), py = yScale(s.ys[i]);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+    });
+    drawAxisX(ctx, xMin, xMax, xScale, marginTop + plotH);
+  }
+
+  function renderComparisonLegend() {
+    const el = document.getElementById("comparisonLegend");
+    const colors = ["--level-1", "--level-2", "--level-3", "--level-4", "--level-5"];
+    el.innerHTML = ALPHA_OPTIONS.map(function (a, i) {
+      return '<span class="item"><span class="swatch" style="background:var(' + colors[i] + ')"></span>α = ' + ALPHA_LABELS[a] + "</span>";
+    }).join("");
+  }
+
+  // Actualiza los textos que describen H₀/H₁ y que dependen del tipo de contraste y de μ₀/σ₀² vigentes
+  function updateHypothesisTexts() {
+    const sym = tailSymbols();
+    const h0m = fN(state.h0Mean, 2), h0v = fN(state.h0Var, 2);
+    const stEl = document.getElementById("hypothesisStatement");
+    if (stEl) {
+      stEl.innerHTML =
+        "Contraste t: H₀: μ = " + h0m + "&nbsp;vs.&nbsp;H₁: μ " + sym.mean + " " + h0m +
+        ". Contraste χ²: H₀: σ² = " + h0v + "&nbsp;vs.&nbsp;H₁: σ² " + sym.varSym + " " + h0v + ".";
+    }
+    const sampSub = document.getElementById("sampDistSub");
+    if (sampSub) {
+      sampSub.innerHTML =
+        "Distribución teórica N(μ, σ²/n), región de rechazo bajo H₀: μ = " + h0m + " frente a H₁: μ " + sym.mean +
+        " " + h0m + " (sombreada) y, si se ejecutaron réplicas, las medias muestrales obtenidas —verde si no se " +
+        "rechaza H₀, rojo si se rechaza.";
+    }
+    const chiSub = document.getElementById("chiSub");
+    if (chiSub) {
+      chiSub.innerHTML =
+        "Densidad χ²<sub>n−1</sub> bajo H₀: σ² = " + h0v + " frente a H₁: σ² " + sym.varSym + " " + h0v +
+        ", región de rechazo (sombreada) y, si se ejecutaron réplicas, los estadísticos T de cada muestra —verde " +
+        "si no se rechaza H₀, rojo si se rechaza.";
+    }
+    const compSub = document.getElementById("comparisonSub");
+    if (compSub) {
+      const h1txt = state.tailType === "two" ? "μ ≠ μ₀" : (state.tailType === "right" ? "μ &gt; μ₀" : "μ &lt; μ₀");
+      compSub.innerHTML =
+        "Potencia teórica del contraste t sobre la media —probabilidad de rechazar H₀: μ = μ₀ frente a H₁: " + h1txt +
+        ", dada la μ efectiva y la σ poblacional conocida— por tamaño muestral y nivel de significancia. Cuando " +
+        "μ₀ coincide con la μ efectiva, esta probabilidad es el error de tipo I y debería aproximarse a α. Hacé " +
+        "clic en una celda para fijarla como configuración activa en el panel superior.";
+    }
+  }
+
+  /* ---------- Renderizado de paneles ---------- */
+
+  function renderPopulationPanel() {
+    if (!state.population) return;
+    drawDensityPanel(
+      document.getElementById("popCanvas"), state.popHistogram, state.population.length,
+      [{ value: state.popMean, color: cssVar("--ink-soft"), dash: false }, { value: state.h0Mean, color: cssVar("--warm"), dash: true }],
+      state.popMean, state.popSD, cssVar("--accent"), cssVar("--accent-soft"), cssVar("--warm")
+    );
+    document.getElementById("popNReadout").textContent = fInt(state.population.length);
+    document.getElementById("popMeanReadout").textContent = fN(state.popMean, 3);
+    document.getElementById("popSDReadout").textContent = fN(state.popSD, 3);
+    const distNames = { normal: "Normal", uniform: "Uniforme", exponential: "Exponencial", bimodal: "Bimodal" };
+    document.getElementById("popTag").textContent = distNames[state.distType] + " · N=" + fInt(state.population.length);
+  }
+
+  function met(l, v) { return '<div><dt>' + l + '</dt><dd>' + v + '</dd></div>'; }
+
+  function renderSampleCard() {
+    const el = document.getElementById("sampleCard");
+    if (!state.currentSample || state.currentSample.n !== state.n) {
+      el.innerHTML = '<p class="muted">Todavía no extrajiste ninguna muestra de tamaño n = ' + fInt(state.n) + ".</p>";
+      return;
+    }
+    const s = state.currentSample;
+    const tt = computeTTest(s, state.n, state.h0Mean);
+    const ct = computeChi2Test(s, state.n, state.h0Var);
+    const rejM = tt.p < state.alpha, rejV = ct.p < state.alpha;
+    const sym = tailSymbols();
+    el.innerHTML =
+      '<div class="test-block">' +
+        '<p class="test-name">Contraste t sobre la media (H₁: μ ' + sym.mean + ' μ₀)</p>' +
+        '<dl class="stat-grid">' +
+          met("n", fInt(state.n)) + met("x̄", fN(s.mean, 3)) + met("s", fN(s.sd, 3)) +
+          met("g.l.", fInt(tt.df)) + met("t", fN(tt.t, 3)) + met("valor p", fPval(tt.p)) +
+        "</dl>" +
+        '<p class="verdict ' + (rejM ? "bad" : "good") + '">' +
+          (rejM ? "✗ Se rechaza H₀: μ = " + fN(state.h0Mean, 2) : "✓ No se rechaza H₀: μ = " + fN(state.h0Mean, 2)) +
+        "</p>" +
+      "</div>" +
+      '<div class="test-block">' +
+        '<p class="test-name">Contraste χ² sobre la varianza (H₁: σ² ' + sym.varSym + ' σ₀²)</p>' +
+        '<dl class="stat-grid">' +
+          met("s²", fN(s.variance, 3)) + met("g.l.", fInt(ct.df)) + met("T", fN(ct.stat, 3)) + met("valor p", fPval(ct.p)) +
+        "</dl>" +
+        '<p class="verdict ' + (rejV ? "bad" : "good") + '">' +
+          (rejV ? "✗ Se rechaza H₀: σ² = " + fN(state.h0Var, 2) : "✓ No se rechaza H₀: σ² = " + fN(state.h0Var, 2)) +
+        "</p>" +
+      "</div>";
+  }
+
+  function tailCritLabelMean(n, alpha) {
+    if (state.tailType === "right") return "t &gt; " + fN(TCRIT_ONE[n][alpha], 3);
+    if (state.tailType === "left") return "t &lt; −" + fN(TCRIT_ONE[n][alpha], 3);
+    return "|t| &gt; " + fN(TCRIT[n][alpha], 3);
+  }
+  function tailCritLabelVar(n, alpha) {
+    const crit = CHI2CRIT[n][alpha];
+    if (state.tailType === "right") return "T &gt; " + fN(crit.oneRight, 3);
+    if (state.tailType === "left") return "T &lt; " + fN(crit.oneLeft, 3);
+    return "T &lt; " + fN(crit.lo, 3) + " ó T &gt; " + fN(crit.hi, 3);
+  }
+
+  function renderSamplingPanel() {
+    const canvas = document.getElementById("sampDistCanvas");
+    const caption = document.getElementById("sampDistCaption");
+    if (!state.population) return;
+    const se = state.popSD / Math.sqrt(state.n);
+    const reps = state.simCache[state.n];
+    drawSamplingRejectionPanel(canvas, state.popMean, se, state.h0Mean, reps, state.n);
+    const critLabel = tailCritLabelMean(state.n, state.alpha);
+    if (!reps) {
+      caption.innerHTML = "Error estándar (SE): <strong>" + fN(se, 4) + "</strong> · región de rechazo: <strong>" + critLabel +
+        "</strong>. Ejecutá una simulación para proyectar las medias muestrales sobre esta distribución.";
+      return;
+    }
+    const rate = rejectRateMean(reps, state.n, state.h0Mean, state.alpha) * 100;
+    caption.innerHTML =
+      "Error estándar (SE): <strong>" + fN(se, 4) + "</strong> · región de rechazo: <strong>" + critLabel +
+      "</strong> · Rechazan H₀: <strong>" + fN(rate, 1) + "%</strong> de " + fInt(reps.length) + " réplicas" +
+      (reps.length > 60 ? " (se grafican las primeras 60)" : "") + ".";
+  }
+
+  function renderChiPanel() {
+    const canvas = document.getElementById("chiCanvas");
+    const caption = document.getElementById("chiCaption");
+    const tagEl = document.getElementById("chiTag");
+    if (!state.population) return;
+    const df = state.n - 1;
+    const reps = state.simCache[state.n];
+    tagEl.textContent = "g.l. = " + fInt(df);
+    drawChiSquarePanel(canvas, df, reps, state.n, state.h0Var);
+    const critLabel = tailCritLabelVar(state.n, state.alpha);
+    if (!reps) {
+      caption.innerHTML = "Región de rechazo: <strong>" + critLabel +
+        "</strong>. Ejecutá una simulación para proyectar los estadísticos T de cada muestra.";
+      return;
+    }
+    const rate = rejectRateVar(reps, state.n, state.h0Var, state.alpha) * 100;
+    caption.innerHTML =
+      "Región de rechazo: <strong>" + critLabel +
+      "</strong> · Rechazan H₀: <strong>" + fN(rate, 1) + "%</strong> de " + fInt(reps.length) + " réplicas" +
+      (reps.length > 60 ? " (se grafican las primeras 60)" : "") + ".";
+  }
+
+  function renderComparisonTable() {
+    const tbody = document.getElementById("comparisonTableBody");
+    if (!state.population) { tbody.innerHTML = ""; return; }
+    tbody.innerHTML = N_OPTIONS.map(function (n) {
+      const cells = ALPHA_OPTIONS.map(function (a) {
+        const prob = theoreticalRejectProb(n, a, state.popMean, state.popSD, state.h0Mean);
+        const active = (n === state.n && a === state.alpha) ? " active" : "";
+        return '<td class="num' + active + '" data-n="' + n + '" data-alpha="' + a + '">' + fN(prob * 100, 1) + "&nbsp;%</td>";
+      }).join("");
+      return "<tr><th>n = " + fInt(n) + "</th>" + cells + "</tr>";
+    }).join("");
+  }
+
+  function renderRateStrips() {
+    const meanEl = document.getElementById("rateStripMean");
+    const varEl = document.getElementById("rateStripVar");
+    const anyCached = N_OPTIONS.some(function (n) { return state.simCache[n]; });
+    const sym = tailSymbols();
+    document.getElementById("meanNullTag").innerHTML =
+      "(H₁: μ " + sym.mean + " μ₀ — " +
+      (Math.abs(state.popMean - state.h0Mean) < 1e-9 ? "H₀ verdadera: se espera ≈ α" : "H₀ falsa: la tasa estima la potencia") + ")";
+    document.getElementById("varNullTag").innerHTML =
+      "(H₁: σ² " + sym.varSym + " σ₀² — " +
+      (Math.abs(state.popSD * state.popSD - state.h0Var) < 1e-6 ? "H₀ verdadera: se espera ≈ α" : "H₀ falsa: la tasa estima la potencia") + ")";
+    if (!anyCached) {
+      const placeholder = '<p class="muted" style="grid-column:1/-1;">Ejecutá «Comparar los 4 tamaños» para estimar la tasa de rechazo empírica.</p>';
+      meanEl.innerHTML = placeholder; varEl.innerHTML = placeholder;
+      return;
+    }
+    meanEl.innerHTML = N_OPTIONS.map(function (n) {
+      const reps = state.simCache[n];
+      if (!reps) return '<div class="rate-badge empty"><span class="rb-n">n = ' + fInt(n) + '</span><span class="rb-val">—</span></div>';
+      const rate = rejectRateMean(reps, n, state.h0Mean, state.alpha) * 100;
+      return '<div class="rate-badge"><span class="rb-n">n = ' + fInt(n) + '</span><span class="rb-val">' + fN(rate, 1) + "%</span></div>";
+    }).join("");
+    varEl.innerHTML = N_OPTIONS.map(function (n) {
+      const reps = state.simCache[n];
+      if (!reps) return '<div class="rate-badge empty"><span class="rb-n">n = ' + fInt(n) + '</span><span class="rb-val">—</span></div>';
+      const rate = rejectRateVar(reps, n, state.h0Var, state.alpha) * 100;
+      return '<div class="rate-badge"><span class="rb-n">n = ' + fInt(n) + '</span><span class="rb-val">' + fN(rate, 1) + "%</span></div>";
+    }).join("");
+  }
+
+  function renderSmallDistGrid() {
+    N_OPTIONS.forEach(function (n) {
+      const canvas = document.getElementById("smallDistCanvas" + n);
+      const caption = document.getElementById("smallDistCaption" + n);
+      if (!canvas || !state.population) return;
+      const reps = state.simCache[n];
+      if (!reps) {
+        clearCanvasPlaceholder(canvas, "Sin réplicas todavía.");
+        caption.textContent = "";
+        return;
+      }
+      const means = reps.map(function (r) { return r.mean; });
+      const binCount = Math.max(10, Math.min(30, Math.round(Math.sqrt(means.length))));
+      const hist = computeHistogram(means, binCount);
+      const theoreticalSE = state.popSD / Math.sqrt(n);
+      drawDensityPanel(
+        canvas, hist, means.length,
+        [{ value: state.popMean, color: cssVar("--ink-soft"), dash: false }, { value: state.h0Mean, color: cssVar("--warm"), dash: true }],
+        state.popMean, theoreticalSE, cssVar("--accent"), cssVar("--accent-soft"), cssVar("--warm")
+      );
+      let sum = 0; means.forEach(function (m) { sum += m; });
+      const empMean = sum / means.length;
+      let ss = 0; means.forEach(function (m) { ss += (m - empMean) * (m - empMean); });
+      const empSD = Math.sqrt(ss / (means.length - 1));
+      const rejRate = rejectRateMean(reps, n, state.h0Mean, state.alpha) * 100;
+      caption.innerHTML =
+        "x̄ media: <strong>" + fN(empMean, 2) + "</strong> · DE(x̄): <strong>" + fN(empSD, 3) +
+        "</strong> · σ/√n: <strong>" + fN(theoreticalSE, 3) + "</strong> · rechazan H₀:μ: <strong>" + fN(rejRate, 1) + "%</strong> · R = " + fInt(means.length);
+    });
+  }
+
+  function renderOverlayDistChart() {
+    const canvas = document.getElementById("overlayDistCanvas");
+    const legend = document.getElementById("overlayDistLegend");
+    const caption = document.getElementById("overlayDistCaption");
+    if (!canvas || !state.population) return;
+    const available = N_OPTIONS.filter(function (n) { return !!state.simCache[n]; });
+    if (available.length === 0) {
+      clearCanvasPlaceholder(canvas, "Ejecutá réplicas para uno o más tamaños de muestra para ver las distribuciones superpuestas.");
+      legend.innerHTML = "";
+      caption.textContent = "";
+      return;
+    }
+    let globalMin = Infinity, globalMax = -Infinity;
+    const seriesData = available.map(function (n) {
+      const reps = state.simCache[n];
+      const means = reps.map(function (r) { return r.mean; });
+      let sum = 0; means.forEach(function (m) { sum += m; });
+      const empMean = sum / means.length;
+      let ss = 0; means.forEach(function (m) { ss += (m - empMean) * (m - empMean); });
+      const empSD = Math.sqrt(ss / (means.length - 1)) || (state.popSD / Math.sqrt(n)) || 1e-9;
+      means.forEach(function (m) { if (m < globalMin) globalMin = m; if (m > globalMax) globalMax = m; });
+      return { n: n, means: means, empSD: empSD };
+    });
+    const span = (globalMax - globalMin) || 1;
+    const pad = span * 0.06;
+    globalMin -= pad; globalMax += pad;
+    const EVAL_POINTS = 220;
+    const evalXs = [];
+    for (let i = 0; i <= EVAL_POINTS; i++) evalXs.push(globalMin + (globalMax - globalMin) * i / EVAL_POINTS);
+    const seriesList = seriesData.map(function (s) {
+      const R = s.means.length;
+      const bw = Math.max(1.06 * s.empSD * Math.pow(R, -0.2), (globalMax - globalMin) / 500);
+      const ys = gaussianKDE(s.means, evalXs, bw);
+      return { n: s.n, xs: evalXs, ys: ys, color: cssVar(N_COLOR_VARS[s.n]) };
+    });
+    drawOverlayChart(canvas, seriesList, globalMin, globalMax);
+    legend.innerHTML = seriesList.map(function (s) {
+      return '<span class="item"><span class="swatch" style="background:' + s.color + '"></span>n = ' + fInt(s.n) + "</span>";
+    }).join("");
+    const capParts = seriesData.map(function (s) {
+      return "n=" + fInt(s.n) + ": DE(x̄)≈" + fN(s.empSD, 3);
+    });
+    caption.innerHTML =
+      "Soporte común: [" + fN(globalMin, 2) + " ; " + fN(globalMax, 2) + "]. " + capParts.join(" · ") +
+      ". La línea vertical discontinua marca μ. Como cada curva integra a 1 sobre su propio rango de variación, " +
+      "las distribuciones más concentradas (n grande) exhiben picos de densidad proporcionalmente más altos: " +
+      "esa es, precisamente, la manifestación visual de la reducción del error estándar a razón de 1/√n —y, por " +
+      "lo tanto, del aumento de la potencia del contraste t— a medida que n crece.";
+  }
+
+  // Tarjeta «10 muestras independientes»: solo visible cuando R = 10. Lista, para cada réplica ya ejecutada
+  // sobre el n actual, sus estadísticos y el dictamen de ambos contrastes; un clic en una fila muestra su
+  // histograma individual en la tarjeta «Muestra seleccionada».
+  function renderRepsTable() {
+    const tableCard = document.getElementById("repsTableCard");
+    const detailCard = document.getElementById("selectedSampleCard");
+    if (state.reps !== 10 || !state.population) {
+      tableCard.style.display = "none";
+      detailCard.style.display = "none";
+      return;
+    }
+    tableCard.style.display = "";
+    document.getElementById("repsTableN").textContent = fInt(state.n);
+    const tbody = document.getElementById("repsTableBody");
+    const reps = state.simCache[state.n];
+    if (!reps) {
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:16px;white-space:normal;">' +
+        "Ejecutá «Ejecutar R réplicas» o «Comparar los 4 tamaños» (con R&nbsp;=&nbsp;10) para ver el detalle de las 10 muestras.</td></tr>";
+      state.selectedRepIdx = null;
+      detailCard.style.display = "none";
+      return;
+    }
+    tbody.innerHTML = reps.map(function (s, i) {
+      const tt = computeTTest(s, state.n, state.h0Mean);
+      const ct = computeChi2Test(s, state.n, state.h0Var);
+      const rejM = tt.p < state.alpha, rejV = ct.p < state.alpha;
+      return '<tr class="rep-row" data-idx="' + i + '">' +
+        "<td>" + (i + 1) + "</td>" +
+        "<td>" + fN(s.mean, 3) + "</td>" +
+        "<td>" + fN(s.variance, 3) + "</td>" +
+        "<td>" + fN(tt.t, 3) + "</td>" +
+        "<td>" + fPval(tt.p) + "</td>" +
+        '<td><span class="badge-test ' + (rejM ? "fail" : "pass") + '">' + (rejM ? "Rechazar" : "No rechazar") + "</span></td>" +
+        "<td>" + fN(ct.stat, 3) + "</td>" +
+        "<td>" + fPval(ct.p) + "</td>" +
+        '<td><span class="badge-test ' + (rejV ? "fail" : "pass") + '">' + (rejV ? "Rechazar" : "No rechazar") + "</span></td>" +
+        "</tr>";
+    }).join("");
+    if (state.selectedRepIdx != null && reps[state.selectedRepIdx] && reps[state.selectedRepIdx].data) {
+      renderSelectedSample(state.selectedRepIdx);
+    } else {
+      state.selectedRepIdx = null;
+      detailCard.style.display = "none";
+    }
+  }
+
+  // Histograma de detalle de una réplica individual (requiere que se haya conservado su arreglo `data`, ver keepRaw)
+  function renderSelectedSample(idx) {
+    const reps = state.simCache[state.n];
+    if (!reps || !reps[idx] || !reps[idx].data) return;
+    state.selectedRepIdx = idx;
+    document.querySelectorAll("#repsTableBody tr.rep-row").forEach(function (tr) {
+      tr.classList.toggle("selected", parseInt(tr.dataset.idx, 10) === idx);
+    });
+    const s = reps[idx];
+    const tt = computeTTest(s, state.n, state.h0Mean);
+    const rejM = tt.p < state.alpha;
+    document.getElementById("selectedSampleTitle").textContent = "Muestra #" + (idx + 1) + " · n = " + fInt(state.n);
+    document.getElementById("selectedSampleStats").innerHTML =
+      met("x̄", fN(s.mean, 3)) + met("s²", fN(s.variance, 3)) + met("t", fN(tt.t, 3)) + met("valor p", fPval(tt.p));
+    const verdictEl = document.getElementById("selectedSampleVerdict");
+    verdictEl.className = "verdict " + (rejM ? "bad" : "good");
+    verdictEl.textContent = rejM
+      ? "✗ Se rechaza H₀: μ = " + fN(state.h0Mean, 2)
+      : "✓ No se rechaza H₀: μ = " + fN(state.h0Mean, 2);
+    const binCount = Math.max(8, Math.min(24, Math.round(Math.sqrt(s.data.length))));
+    const hist = computeHistogram(s.data, binCount);
+    drawDensityPanel(
+      document.getElementById("selectedSampleCanvas"), hist, s.data.length,
+      [{ value: s.mean, color: cssVar("--good"), dash: false }, { value: state.h0Mean, color: cssVar("--warm"), dash: true }],
+      null, null, cssVar("--accent"), cssVar("--accent-soft"), cssVar("--warm")
+    );
+    document.getElementById("selectedSampleLegend").innerHTML =
+      '<span class="item"><span class="swatch" style="background:' + cssVar("--good") + '"></span>x̄</span>' +
+      '<span class="item"><span class="swatch" style="background:' + cssVar("--warm") + '"></span>μ₀</span>';
+    document.getElementById("selectedSampleCard").style.display = "";
+  }
+
+  function redrawAll() {
+    renderPopulationPanel();
+    renderSamplingPanel();
+    renderChiPanel();
+    renderSmallDistGrid();
+    renderOverlayDistChart();
+    drawComparisonChart(document.getElementById("comparisonChartCanvas"));
+    renderRepsTable();
+  }
+
+  /* ---------- Construcción de la población y ciclo de eventos ---------- */
+
+  function buildPopulation(distType, seed, targetMu) {
+    state.distType = distType;
+    state.population = generatePopulation(distType, seed, targetMu);
+    const ms = populationMeanSD(state.population);
+    state.popMean = ms.mean; state.popSD = ms.sd;
+    state.popHistogram = computeHistogram(state.population, 60);
+    state.currentSample = null;
+    state.simCache = { 10: null, 100: null, 1000: null, 10000: null };
+    state.selectedRepIdx = null;
+    document.getElementById("seedInput").value = String(seed);
+    document.getElementById("muInput").value = String(targetMu);
+    updateHypothesisTexts();
+    renderPopulationPanel();
+    renderSampleCard();
+    renderSamplingPanel();
+    renderChiPanel();
+    renderComparisonTable();
+    renderRateStrips();
+    renderSmallDistGrid();
+    renderOverlayDistChart();
+    drawComparisonChart(document.getElementById("comparisonChartCanvas"));
+    renderRepsTable();
+  }
+
+  function currentSeedValue() {
+    const raw = document.getElementById("seedInput").value;
+    const v = parseInt(raw, 10);
+    return Number.isFinite(v) && v >= 0 ? (v >>> 0) : (Date.now() >>> 0);
+  }
+  function currentMuValue() {
+    const v = parseFloat(document.getElementById("muInput").value);
+    return Number.isFinite(v) ? v : 50;
+  }
+
+  function applyN(n) {
+    if (state.n === n) return;
+    state.n = n;
+    document.querySelectorAll("#nButtons button").forEach(function (b) {
+      b.classList.toggle("active", parseInt(b.dataset.n, 10) === n);
+    });
+    renderSampleCard();
+    renderSamplingPanel();
+    renderChiPanel();
+    renderComparisonTable();
+    renderRepsTable();
+  }
+
+  function applyAlpha(alpha) {
+    if (state.alpha === alpha) return;
+    state.alpha = alpha;
+    document.querySelectorAll("#alphaButtons button").forEach(function (b) {
+      b.classList.toggle("active", parseFloat(b.dataset.alpha) === alpha);
+    });
+    renderSampleCard();
+    renderSamplingPanel();
+    renderChiPanel();
+    renderComparisonTable();
+    renderRateStrips();
+    renderSmallDistGrid();
+    renderRepsTable();
+  }
+
+  function applyH0Mean(v) {
+    if (!Number.isFinite(v) || state.h0Mean === v) return;
+    state.h0Mean = v;
+    updateHypothesisTexts();
+    renderSampleCard();
+    renderPopulationPanel();
+    renderSamplingPanel();
+    renderComparisonTable();
+    renderRateStrips();
+    renderSmallDistGrid();
+    renderRepsTable();
+  }
+
+  function applyH0Var(v) {
+    if (!Number.isFinite(v) || v <= 0 || state.h0Var === v) return;
+    state.h0Var = v;
+    updateHypothesisTexts();
+    renderSampleCard();
+    renderChiPanel();
+    renderRateStrips();
+    renderRepsTable();
+  }
+
+  function applyTailType(tail) {
+    if (state.tailType === tail) return;
+    state.tailType = tail;
+    document.querySelectorAll("#tailButtons button").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.tail === tail);
+    });
+    updateHypothesisTexts();
+    renderSampleCard();
+    renderSamplingPanel();
+    renderChiPanel();
+    renderComparisonTable();
+    renderRateStrips();
+    renderSmallDistGrid();
+    drawComparisonChart(document.getElementById("comparisonChartCanvas"));
+    renderRepsTable();
+  }
+
+  document.querySelectorAll("#popDistButtons button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("#popDistButtons button").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      buildPopulation(btn.dataset.dist, currentSeedValue(), currentMuValue());
+    });
+  });
+
+  document.getElementById("randomizeSeedBtn").addEventListener("click", function () {
+    document.getElementById("seedInput").value = String(Math.floor(Math.random() * 1e9));
+  });
+
+  document.getElementById("regenBtn").addEventListener("click", function () {
+    buildPopulation(state.distType, currentSeedValue(), currentMuValue());
+  });
+
+  document.querySelectorAll("#nButtons button").forEach(function (btn) {
+    btn.addEventListener("click", function () { applyN(parseInt(btn.dataset.n, 10)); });
+  });
+  document.querySelectorAll("#alphaButtons button").forEach(function (btn) {
+    btn.addEventListener("click", function () { applyAlpha(parseFloat(btn.dataset.alpha)); });
+  });
+  document.querySelectorAll("#tailButtons button").forEach(function (btn) {
+    btn.addEventListener("click", function () { applyTailType(btn.dataset.tail); });
+  });
+
+  document.getElementById("h0MeanInput").addEventListener("input", function (e) {
+    applyH0Mean(parseFloat(e.target.value));
+  });
+  document.getElementById("h0VarInput").addEventListener("input", function (e) {
+    applyH0Var(parseFloat(e.target.value));
+  });
+
+  document.getElementById("repsSelect").addEventListener("change", function (e) {
+    state.reps = parseInt(e.target.value, 10);
+    state.simCache = { 10: null, 100: null, 1000: null, 10000: null };
+    state.selectedRepIdx = null;
+    renderSamplingPanel(); renderChiPanel(); renderRateStrips(); renderSmallDistGrid(); renderOverlayDistChart();
+    renderRepsTable();
+  });
+
+  document.getElementById("drawSampleBtn").addEventListener("click", function () {
+    if (!state.population) return;
+    state.currentSample = drawSampleStats(state.population, state.n);
+    renderSampleCard();
+  });
+
+  document.getElementById("runSimBtn").addEventListener("click", function () {
+    if (!state.population) return;
+    state.simCache[state.n] = runReplications(state.population, state.n, state.reps, state.reps === 10);
+    state.selectedRepIdx = null;
+    renderSamplingPanel();
+    renderChiPanel();
+    renderRateStrips();
+    renderSmallDistGrid();
+    renderOverlayDistChart();
+    renderRepsTable();
+  });
+
+  document.getElementById("compareBtn").addEventListener("click", function () {
+    if (!state.population) return;
+    N_OPTIONS.forEach(function (n) { state.simCache[n] = runReplications(state.population, n, state.reps, state.reps === 10); });
+    state.selectedRepIdx = null;
+    renderSamplingPanel();
+    renderChiPanel();
+    renderRateStrips();
+    renderSmallDistGrid();
+    renderOverlayDistChart();
+    renderRepsTable();
+  });
+
+  document.getElementById("repsTableBody").addEventListener("click", function (e) {
+    const tr = e.target.closest("tr.rep-row");
+    if (!tr) return;
+    renderSelectedSample(parseInt(tr.dataset.idx, 10));
+  });
+
+  document.getElementById("comparisonTableBody").addEventListener("click", function (e) {
+    const td = e.target.closest("td[data-n]");
+    if (!td) return;
+    applyN(parseInt(td.dataset.n, 10));
+    applyAlpha(parseFloat(td.dataset.alpha));
+  });
+
+  document.getElementById("themeToggleBtn").addEventListener("click", function () {
+    const next = effectiveTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    setStoredTheme(next);
+    updateThemeToggleUI();
+    redrawAll();
+  });
+
+  let resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(redrawAll, 130);
+  });
+  const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  if (darkQuery.addEventListener) {
+    darkQuery.addEventListener("change", function () {
+      if (!document.documentElement.getAttribute("data-theme")) {
+        updateThemeToggleUI();
+        redrawAll();
+      }
+    });
+  }
+
+  initTheme();
+  renderComparisonLegend();
+  buildPopulation("normal", currentSeedValue(), currentMuValue());
+})();
+</script>
+</body>
+</html>

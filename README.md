@@ -33,7 +33,11 @@ El laboratorio:
    tipo de contraste y al nivel de significancia α elegidos (una región bilateral repartida en ambas colas, o
    una única región concentrada en la cola indicada por H₁), y —una vez ejecutadas las réplicas— la proyección
    de cada estadístico muestral sobre esa distribución, coloreada según la decisión (verde: no se rechaza H₀;
-   rojo: se rechaza H₀).
+   rojo: se rechaza H₀). En el panel de la media, la distribución muestral bajo H₀ se traza como una t de
+   Student con g.l. = n−1 centrada en μ₀ (trazo principal, coincidente con los límites de la región de rechazo),
+   superpuesta —como referencia punteada— a la distribución muestral aproximada por el teorema central del
+   límite a partir de los datos poblacionales efectivos (N(μ, σ²/n)); ambas convergen visualmente cuando μ₀ = μ
+   o cuando n es grande, y se separan cuando H₀ es falsa o n es pequeño.
 5. **Reporta tasas de rechazo empíricas** por tamaño de muestra: si μ₀ (o σ₀²) coincide con el valor poblacional
    efectivo, la tasa observada bajo repetición del muestreo estima el error de tipo I y debería aproximarse a α;
    si no coincide, estima la potencia del contraste frente a esa alternativa específica.
@@ -82,12 +86,20 @@ El laboratorio:
   para desplegar la tabla de detalle; haciendo clic en cada fila se observa cómo, a igualdad de μ y μ₀, la
   variabilidad muestral produce estadísticos t y valores p distintos —y, ocasionalmente, dictámenes distintos—
   entre réplicas generadas por el mismo proceso poblacional.
+- **Distribución bajo H₀ vs. distribución con los datos poblacionales**: con n pequeño (por ejemplo, n = 10) y
+  μ₀ desplazada respecto de μ, observá cómo la curva sólida (t, g.l. = n−1, centrada en μ₀) y la curva punteada
+  (aprox. normal, centrada en la μ efectiva) se separan claramente, y cómo los límites de la región de rechazo
+  coinciden exactamente con las colas de la curva sólida —no con las de la punteada—, dado que la región de
+  rechazo se construye bajo el supuesto de que H₀ es verdadera. Aumentá n y notá cómo ambas curvas convergen
+  progresivamente (t<sub>n−1</sub> → N(0,1) estandarizada) cuando μ₀ = μ.
 
 ## Implementación estadística
 
 Todas las funciones están implementadas en JS puro, sin librerías externas de estadística:
 
 - **Mulberry32 + transformación de Box-Muller** — generación de la población y de las muestras.
+- **Densidad t de Student** (a partir de la función gamma vía `gammln`) — curva de la distribución muestral
+  teórica bajo H₀ en el panel de la media, con g.l. = n−1.
 - **Función beta incompleta regularizada** (fracciones continuas) — valores críticos y valor p del contraste t.
 - **Función gamma incompleta regularizada** (serie + fracción continua) — densidad, valores críticos y valor p
   del contraste χ².

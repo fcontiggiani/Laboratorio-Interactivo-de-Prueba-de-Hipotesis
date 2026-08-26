@@ -491,6 +491,10 @@ footer.notes p { margin: 4px 0; }
           </div>
           <p class="panel-sub" id="sampDistSub"></p>
           <canvas class="chart" id="sampDistCanvas" style="height:230px;" role="img" aria-label="Distribución muestral de la media con región de rechazo del contraste t"></canvas>
+          <div class="legend" id="sampDistLegend">
+            <span class="item"><span class="swatch line" style="background:none;border-top:2.5px solid var(--accent);"></span>Bajo H₀ (t, g.l.&nbsp;=&nbsp;n−1, centrada en μ₀)</span>
+            <span class="item"><span class="swatch line" style="background:none;border-top:2px dashed var(--ink-soft);"></span>Con los datos poblacionales (aprox. normal, centrada en μ)</span>
+          </div>
           <p class="caption" id="sampDistCaption"></p>
         </div>
       </div>
@@ -774,6 +778,12 @@ footer.notes p { margin: 4px 0; }
   }
   // P(χ²_df <= x): CDF de la chi-cuadrado
   function chi2CDF(x, df) { return gammaP(df / 2, x / 2); }
+
+  // Densidad t de Student estándar (media 0, escala 1) con df grados de libertad, evaluada en x
+  function tPDF(x, df) {
+    return Math.exp(gammln((df + 1) / 2) - gammln(df / 2)) / Math.sqrt(df * Math.PI) *
+      Math.pow(1 + (x * x) / df, -(df + 1) / 2);
+  }
 
   /* ---------- Generador pseudoaleatorio (mulberry32) y variables aleatorias ---------- */
 
@@ -1165,11 +1175,23 @@ footer.notes p { margin: 4px 0; }
     const plotH = plotBottom - plotTop;
     const plotW = w - marginLeft - marginRight;
     const alpha = state.alpha;
+    const df = n - 1;
     const lo = Math.min(popMean, h0Mean) - 5 * theoreticalSE, hi = Math.max(popMean, h0Mean) + 5 * theoreticalSE;
     const xScale = function (v) { return marginLeft + (v - lo) / (hi - lo) * plotW; };
-    const pts = [];
-    for (let i = 0; i <= 300; i++) { const x = lo + i * (hi - lo) / 300; pts.push({ x: x, y: Math.exp(-((x - popMean) * (x - popMean)) / (2 * theoreticalSE * theoreticalSE)) / (theoreticalSE * Math.sqrt(2 * Math.PI)) }); }
-    const maxY = Math.max.apply(null, pts.map(function (p) { return p.y; })) * 1.08 || 1;
+    // Curva A: distribución muestral teórica de X̄ derivada de los datos poblacionales (aprox. normal, N(μ, σ²/n))
+    // Curva B: distribución muestral teórica bajo H₀ (t de Student, gl = n−1, centrada en μ₀ y escalada por el SE),
+    // la misma que determina —vía TCRIT/TCRIT_ONE— los límites de la región de rechazo sombreada más abajo.
+    const steps = 360;
+    const popPts = [], h0Pts = [];
+    for (let i = 0; i <= steps; i++) {
+      const x = lo + i * (hi - lo) / steps;
+      popPts.push({ x: x, y: Math.exp(-((x - popMean) * (x - popMean)) / (2 * theoreticalSE * theoreticalSE)) / (theoreticalSE * Math.sqrt(2 * Math.PI)) });
+      h0Pts.push({ x: x, y: tPDF((x - h0Mean) / theoreticalSE, df) / theoreticalSE });
+    }
+    const maxY = Math.max(
+      Math.max.apply(null, popPts.map(function (p) { return p.y; })),
+      Math.max.apply(null, h0Pts.map(function (p) { return p.y; }))
+    ) * 1.08 || 1;
     const yScale = function (v) { return plotBottom - (v / maxY) * plotH; };
     // Región(es) de rechazo según el tipo de contraste vigente
     let shadeRegions;
@@ -1187,8 +1209,14 @@ footer.notes p { margin: 4px 0; }
       const xTo = isFinite(r.to) ? Math.min(marginLeft + plotW, xScale(r.to)) : marginLeft + plotW;
       if (xTo > xFrom) ctx.fillRect(xFrom, plotTop, xTo - xFrom, plotH);
     });
+    // Curva poblacional (referencia): trazo suave y entrecortado, subordinado visualmente a la curva de H₀
+    ctx.strokeStyle = cssVar("--ink-soft"); ctx.lineWidth = 1.7; ctx.setLineDash([7, 5]); ctx.lineJoin = "round"; ctx.beginPath();
+    popPts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+    ctx.stroke();
+    ctx.setLineDash([]); ctx.lineJoin = "miter";
+    // Curva de H₀ (t de Student, gl = n−1): traza principal, coincide con los límites de la región sombreada
     ctx.strokeStyle = cssVar("--accent"); ctx.lineWidth = 2.2; ctx.beginPath();
-    pts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+    h0Pts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
     ctx.stroke();
     ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5; ctx.strokeStyle = cssVar("--bad");
     shadeRegions.forEach(function (r) {
@@ -1400,9 +1428,10 @@ footer.notes p { margin: 4px 0; }
     const sampSub = document.getElementById("sampDistSub");
     if (sampSub) {
       sampSub.innerHTML =
-        "Distribución teórica N(μ, σ²/n), región de rechazo bajo H₀: μ = " + h0m + " frente a H₁: μ " + sym.mean +
-        " " + h0m + " (sombreada) y, si se ejecutaron réplicas, las medias muestrales obtenidas —verde si no se " +
-        "rechaza H₀, rojo si se rechaza.";
+        "Distribución muestral teórica de X̄ bajo H₀: μ = " + h0m + " (t<sub>n−1</sub>, trazo principal) y, como " +
+        "referencia, la derivada de los datos poblacionales (aprox. normal, trazo punteado); región de rechazo " +
+        "frente a H₁: μ " + sym.mean + " " + h0m + " (sombreada, determinada por la distribución bajo H₀) y, si " +
+        "se ejecutaron réplicas, las medias muestrales obtenidas —verde si no se rechaza H₀, rojo si se rechaza.";
     }
     const chiSub = document.getElementById("chiSub");
     if (chiSub) {

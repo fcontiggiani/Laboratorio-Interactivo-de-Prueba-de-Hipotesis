@@ -506,6 +506,10 @@ footer.notes p { margin: 4px 0; }
         </div>
         <p class="panel-sub" id="chiSub"></p>
         <canvas class="chart" id="chiCanvas" style="height:230px;" role="img" aria-label="Distribución chi-cuadrado del estadístico de prueba de varianza con región de rechazo"></canvas>
+        <div class="legend" id="chiLegend">
+          <span class="item"><span class="swatch line" style="background:none;border-top:2.5px solid var(--accent);"></span>Bajo H₀ (χ², g.l.&nbsp;=&nbsp;n−1, sin escalar)</span>
+          <span class="item"><span class="swatch line" style="background:none;border-top:2px dashed var(--ink-soft);"></span>Con los datos poblacionales (χ² escalada por σ²/σ₀²)</span>
+        </div>
         <p class="caption" id="chiCaption"></p>
       </div>
     </div>
@@ -1255,7 +1259,7 @@ footer.notes p { margin: 4px 0; }
   }
 
   // Panel de la densidad χ²(df) con región de rechazo (bilateral o unilateral) y réplicas marcadas
-  function drawChiSquarePanel(canvas, df, repsArr, n, h0Var) {
+  function drawChiSquarePanel(canvas, df, repsArr, n, h0Var, popVar) {
     const ctx = prepCanvas(canvas);
     const w = canvas._cssWidth, h = canvas._cssHeight;
     ctx.clearRect(0, 0, w, h);
@@ -1265,11 +1269,26 @@ footer.notes p { margin: 4px 0; }
     const plotW = w - marginLeft - marginRight;
     const alpha = state.alpha;
     const crit = CHI2CRIT[n][alpha];
-    const xMax = Math.min(chi2Inv(0.999, df), crit.hi * 2.4, df * 6 + 40);
+    // Factor de escala entre la distribución bajo H₀ y la derivada de los datos poblacionales: si T = (n−1)s²/σ₀²
+    // y (n−1)s²/σ² ~ χ²(df) (bajo normalidad poblacional), entonces T = c·χ²(df) con c = σ²_poblacional/σ₀².
+    const c = popVar / h0Var;
+    const xMaxBase = Math.min(chi2Inv(0.999, df), crit.hi * 2.4, df * 6 + 40);
+    const xMax = Math.max(xMaxBase, c * xMaxBase);
     const xScale = function (v) { return marginLeft + v / xMax * plotW; };
-    const pts = [];
-    for (let i = 0; i <= 320; i++) { const x = i * xMax / 320; pts.push({ x: x, y: chi2PDF(x, df) }); }
-    const maxY = Math.max.apply(null, pts.map(function (p) { return p.y; })) * 1.08 || 1;
+    // Curva A: distribución teórica del estadístico T derivada de los datos poblacionales (χ²(df) escalada por c)
+    // Curva B: distribución teórica de T bajo H₀ (χ²(df), sin escalar), la misma que determina —vía CHI2CRIT—
+    // los límites de la región de rechazo sombreada más abajo.
+    const steps = 360;
+    const popPts = [], h0Pts = [];
+    for (let i = 0; i <= steps; i++) {
+      const x = i * xMax / steps;
+      popPts.push({ x: x, y: chi2PDF(x / c, df) / c });
+      h0Pts.push({ x: x, y: chi2PDF(x, df) });
+    }
+    const maxY = Math.max(
+      Math.max.apply(null, popPts.map(function (p) { return p.y; })),
+      Math.max.apply(null, h0Pts.map(function (p) { return p.y; }))
+    ) * 1.08 || 1;
     const yScale = function (v) { return plotBottom - (v / maxY) * plotH; };
     // Región(es) de rechazo según el tipo de contraste vigente
     let shadeRegions;
@@ -1286,8 +1305,14 @@ footer.notes p { margin: 4px 0; }
       const xTo = isFinite(r.to) ? Math.min(marginLeft + plotW, xScale(r.to)) : marginLeft + plotW;
       if (xTo > xFrom) ctx.fillRect(xFrom, plotTop, xTo - xFrom, plotH);
     });
+    // Curva poblacional (referencia): trazo suave y entrecortado, subordinado visualmente a la curva de H₀
+    ctx.strokeStyle = cssVar("--ink-soft"); ctx.lineWidth = 1.7; ctx.setLineDash([7, 5]); ctx.lineJoin = "round"; ctx.beginPath();
+    popPts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+    ctx.stroke();
+    ctx.setLineDash([]); ctx.lineJoin = "miter";
+    // Curva de H₀ (χ²(df)): traza principal, coincide con los límites de la región sombreada
     ctx.strokeStyle = cssVar("--accent"); ctx.lineWidth = 2.2; ctx.beginPath();
-    pts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+    h0Pts.forEach(function (p, i) { const x = xScale(p.x), y = yScale(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
     ctx.stroke();
     ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5; ctx.strokeStyle = cssVar("--bad");
     shadeRegions.forEach(function (r) {
@@ -1298,9 +1323,13 @@ footer.notes p { margin: 4px 0; }
       });
     });
     ctx.setLineDash([]);
-    ctx.strokeStyle = cssVar("--warm"); ctx.lineWidth = 2;
+    ctx.strokeStyle = cssVar("--ink-soft"); ctx.lineWidth = 2;
+    const pxPopExp = xScale(c * df);
+    ctx.beginPath(); ctx.moveTo(pxPopExp, plotTop); ctx.lineTo(pxPopExp, plotBottom); ctx.stroke();
+    ctx.strokeStyle = cssVar("--warm"); ctx.setLineDash([4, 4]); ctx.lineWidth = 2;
     const pxDf = xScale(df);
     ctx.beginPath(); ctx.moveTo(pxDf, plotTop); ctx.lineTo(pxDf, plotBottom); ctx.stroke();
+    ctx.setLineDash([]);
     if (repsArr && repsArr.length) {
       const slotY = plotBottom + 10;
       const display = repsArr.slice(0, Math.min(60, repsArr.length));
@@ -1436,9 +1465,11 @@ footer.notes p { margin: 4px 0; }
     const chiSub = document.getElementById("chiSub");
     if (chiSub) {
       chiSub.innerHTML =
-        "Densidad χ²<sub>n−1</sub> bajo H₀: σ² = " + h0v + " frente a H₁: σ² " + sym.varSym + " " + h0v +
-        ", región de rechazo (sombreada) y, si se ejecutaron réplicas, los estadísticos T de cada muestra —verde " +
-        "si no se rechaza H₀, rojo si se rechaza.";
+        "Distribución teórica de T = (n−1)s²/σ₀² bajo H₀: σ² = " + h0v + " (χ²<sub>n−1</sub>, trazo principal) y, " +
+        "como referencia, la derivada de los datos poblacionales (χ²<sub>n−1</sub> escalada por σ²/σ₀², trazo " +
+        "punteado); región de rechazo frente a H₁: σ² " + sym.varSym + " " + h0v + " (sombreada, determinada por " +
+        "la distribución bajo H₀) y, si se ejecutaron réplicas, los estadísticos T de cada muestra —verde si no " +
+        "se rechaza H₀, rojo si se rechaza.";
     }
     const compSub = document.getElementById("comparisonSub");
     if (compSub) {
@@ -1542,7 +1573,7 @@ footer.notes p { margin: 4px 0; }
     const df = state.n - 1;
     const reps = state.simCache[state.n];
     tagEl.textContent = "g.l. = " + fInt(df);
-    drawChiSquarePanel(canvas, df, reps, state.n, state.h0Var);
+    drawChiSquarePanel(canvas, df, reps, state.n, state.h0Var, state.popSD * state.popSD);
     const critLabel = tailCritLabelVar(state.n, state.alpha);
     if (!reps) {
       caption.innerHTML = "Región de rechazo: <strong>" + critLabel +

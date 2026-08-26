@@ -4,14 +4,15 @@ Herramienta visual e interactiva para explorar el contraste de hipótesis clási
 poblacional —con la media poblacional fijada discrecionalmente por quien la usa—, construida en HTML/JS puro,
 sin dependencias de backend ni de librerías externas de graficación o de estadística.
 
-Este laboratorio se construyó sobre la base del [Laboratorio de Intervalos de Confianza](../laboratorio-intervalos-de-confianza),
+Este laboratorio se construyó sobre la base del [Laboratorio de Intervalos de Confianza](https://github.com/fcontiggiani/Laboratorio-de-Prueba-de-Hipotesis),
 del cual conserva el motor de simulación, el sistema de diseño (tipografías, paleta y tema claro/oscuro) y la
 mayor parte de los controles y paneles, reemplazando el bloque de intervalos y cobertura por el análisis de
 contraste de hipótesis descripto más abajo.
 
 ## Demo
 
-Abrí [`index.html`](./index.html) directamente en el navegador — no requiere servidor.
+Abrí [`index.html`](https://fcontiggiani.github.io/
+Laboratorio-Interactivo-de-Prueba-de-Hipotesis/index) directamente en el navegador — no requiere servidor.
 
 ## ¿Qué hace?
 

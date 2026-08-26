@@ -1,4 +1,4 @@
-# Laboratorio Interactivo de Prueba de Hipótesis
+# Laboratorio Interactivo Avanzado de Prueba de Hipótesis
 
 Herramienta visual e interactiva para explorar el contraste de hipótesis clásico sobre la media y la varianza
 poblacional —con la media poblacional fijada discrecionalmente por quien la usa—, construida en HTML/JS puro,
